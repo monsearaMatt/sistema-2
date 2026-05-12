@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  schemas  = ["Logistica", "RRHH"]
+}
+
+model direccion {
+  id_direccion      Int                 @id
+  direccion         String?             @db.VarChar(255)
+  id_cliente        Int?
+  log_guia_despacho log_guia_despacho[]
+
+  @@schema("Logistica")
+}
+
+model log_guia_despacho {
+  id_guia           Int                @id
+  id_ot             Int?
+  id_transportista  Int?
+  id_direccion      Int?
+  fecha_emision     DateTime?          @db.Timestamp(6)
+  direccion         direccion?         @relation(fields: [id_direccion], references: [id_direccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_dir")
+  log_picking       log_picking?       @relation(fields: [id_ot], references: [id_ot], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_ot")
+  log_transportista log_transportista? @relation(fields: [id_transportista], references: [id_transportista], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_transp")
+
+  @@schema("Logistica")
+}
+
+model log_picking {
+  id_ot             Int                 @id
+  id_pedido_venta   Int?
+  id_empleado       Int?
+  fecha_creacion    DateTime?           @db.Timestamp(6)
+  estado            String?             @db.VarChar(50)
+  log_guia_despacho log_guia_despacho[]
+  RRHH_empleado     RRHH_empleado?      @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_picking_empleado")
+
+  @@schema("Logistica")
+}
+
+model log_recepcion {
+  id_recepcion    Int            @id
+  id_orden_compra Int?
+  id_empleado     Int?
+  fecha_recepcion DateTime?      @db.Timestamp(6)
+  RRHH_empleado   RRHH_empleado? @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_recepcion_empleado")
+
+  @@schema("Logistica")
+}
+
+model log_transportista {
+  id_transportista  Int                 @id
+  nombre_transp     String?             @db.VarChar(100)
+  patente_vehiculo  String?             @db.VarChar(10)
+  id_empleado       Int?
+  log_guia_despacho log_guia_despacho[]
+  RRHH_empleado     RRHH_empleado?      @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_transp_empleado")
+
+  @@schema("Logistica")
+}
+
+model RRHH_empleado {
+  id_empleado       Int                 @id
+  rut               String?             @db.VarChar(12)
+  nombre            String?             @db.VarChar(100)
+  id_rol            Int?
+  correo            String?             @db.VarChar(100)
+  telefono          String?             @db.VarChar(20)
+  estado            String?             @db.VarChar(50)
+  log_picking       log_picking[]
+  log_recepcion     log_recepcion[]
+  log_transportista log_transportista[]
+  RRHH_rol          RRHH_rol?           @relation(fields: [id_rol], references: [id_rol], onDelete: NoAction, onUpdate: NoAction, map: "fk_empleado_rol")
+  RRHH_solicitud    RRHH_solicitud[]
+  RRHH_usuario      RRHH_usuario[]
+
+  @@schema("RRHH")
+}
+
+model RRHH_rol {
+  id_rol        Int             @id
+  name_rol      String?         @db.VarChar(100)
+  RRHH_empleado RRHH_empleado[]
+
+  @@schema("RRHH")
+}
+
+model RRHH_solicitud {
+  id_solicitud   Int            @id
+  id_empleado    Int?
+  tipo_solicitud String?        @db.VarChar(100)
+  fecha_inicio   DateTime?      @db.Date
+  fecha_fin      DateTime?      @db.Date
+  estado         String?        @db.VarChar(50)
+  RRHH_empleado  RRHH_empleado? @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_solicitud_empleado")
+
+  @@schema("RRHH")
+}
+
+model RRHH_usuario {
+  id_usuario    Int            @id
+  username      String?        @db.VarChar(50)
+  password      String?        @db.VarChar(255)
+  id_empleado   Int?
+  RRHH_empleado RRHH_empleado? @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_empleado")
+
+  @@schema("RRHH")
+}
