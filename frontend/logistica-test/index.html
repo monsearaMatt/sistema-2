@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prueba Módulo Logística</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Prueba Rápida - Módulo Logística</h1>
+
+    <section class="card small">
+      <h2>Backend</h2>
+      <label>URL del backend
+        <input id="backend-url" type="text" value="http://localhost:3000" />
+      </label>
+      <small class="note">Si el backend corre en otra dirección, cambia este valor y recarga la página.</small>
+    </section>
+
+    <section class="card">
+      <h2>Crear Dirección</h2>
+      <form id="direccion-form">
+        <label>direccion <input name="direccion" type="text" required></label>
+        <label>id_cliente <input name="id_cliente" type="number" required></label>
+        <button type="submit">Crear</button>
+      </form>
+      <pre id="direccion-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Crear Transportista</h2>
+      <form id="transportista-form">
+        <label>nombre_transp <input name="nombre_transp" type="text" required></label>
+        <label>patente_vehiculo <input name="patente_vehiculo" type="text" required></label>
+        <label>id_empleado <input name="id_empleado" type="number" required></label>
+        <button type="submit">Crear</button>
+      </form>
+      <pre id="transportista-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Crear Picking (OT)</h2>
+      <form id="picking-form">
+        <label>id_pedido_venta <input name="id_pedido_venta" type="number" required></label>
+        <label>estado
+          <select name="estado">
+            <option value="Pendiente">Pendiente</option>
+            <option value="En Proceso">En Proceso</option>
+            <option value="Completado">Completado</option>
+          </select>
+        </label>
+        <button type="submit">Crear</button>
+      </form>
+      <pre id="picking-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <h2>Crear Guía de Despacho</h2>
+      <form id="guia-form">
+        <label>id_ot <input name="id_ot" type="number" required></label>
+        <label>id_transportista <input name="id_transportista" type="number" required></label>
+        <label>id_direccion <input name="id_direccion" type="number" required></label>
+        <button type="submit">Crear</button>
+      </form>
+      <pre id="guia-result" class="result"></pre>
+    </section>
+
+    <section class="card small">
+      <h2>KPIs</h2>
+      <button id="kpi-productividad">Productividad</button>
+      <button id="kpi-tiempo">Tiempo despacho</button>
+      <pre id="kpi-result" class="result"></pre>
+    </section>
+
+    <small class="note">Asegúrate de que el backend esté corriendo en <code>http://localhost:3000</code> y que CORS esté habilitado.</small>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>

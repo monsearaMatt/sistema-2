@@ -1,0 +1,10 @@
+FROM sistema-2-backend:latest
+
+# Patch compiled prisma service to provide a constructor that calls super({})
+RUN sed -i "s/extends client_1.PrismaClient {/extends client_1.PrismaClient {\
+    constructor() {\
+        super({});\
+    }/" /app/dist/src/common/prisma/prisma.service.js || true
+
+# Keep same entrypoint
+CMD ["node","dist/src/main.js"]

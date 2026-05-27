@@ -1,6 +1,8 @@
+// Generate the client directly into node_modules so the runtime loads the
+// generated client instead of the installed @prisma/client package.
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -9,7 +11,7 @@ datasource db {
 }
 
 model direccion {
-  id_direccion      Int                 @id
+  id_direccion      Int                 @id @default(autoincrement())
   direccion         String?             @db.VarChar(255)
   id_cliente        Int?
   log_guia_despacho log_guia_despacho[]
@@ -18,7 +20,7 @@ model direccion {
 }
 
 model log_guia_despacho {
-  id_guia           Int                @id
+  id_guia           Int                @id @default(autoincrement())
   id_ot             Int?
   id_transportista  Int?
   id_direccion      Int?
@@ -31,7 +33,7 @@ model log_guia_despacho {
 }
 
 model log_picking {
-  id_ot             Int                 @id
+  id_ot             Int                 @id @default(autoincrement())
   id_pedido_venta   Int?
   id_empleado       Int?
   fecha_creacion    DateTime?           @db.Timestamp(6)
@@ -43,7 +45,7 @@ model log_picking {
 }
 
 model log_recepcion {
-  id_recepcion    Int            @id
+  id_recepcion    Int            @id @default(autoincrement())
   id_orden_compra Int?
   id_empleado     Int?
   fecha_recepcion DateTime?      @db.Timestamp(6)
@@ -53,7 +55,7 @@ model log_recepcion {
 }
 
 model log_transportista {
-  id_transportista  Int                 @id
+  id_transportista  Int                 @id @default(autoincrement())
   nombre_transp     String?             @db.VarChar(100)
   patente_vehiculo  String?             @db.VarChar(10)
   id_empleado       Int?
@@ -64,7 +66,7 @@ model log_transportista {
 }
 
 model RRHH_empleado {
-  id_empleado       Int                 @id
+  id_empleado       Int                 @id @default(autoincrement())
   rut               String?             @db.VarChar(12)
   nombre            String?             @db.VarChar(100)
   id_rol            Int?
@@ -82,7 +84,7 @@ model RRHH_empleado {
 }
 
 model RRHH_rol {
-  id_rol        Int             @id
+  id_rol        Int             @id @default(autoincrement())
   name_rol      String?         @db.VarChar(100)
   RRHH_empleado RRHH_empleado[]
 
@@ -90,7 +92,7 @@ model RRHH_rol {
 }
 
 model RRHH_solicitud {
-  id_solicitud   Int            @id
+  id_solicitud   Int            @id @default(autoincrement())
   id_empleado    Int?
   tipo_solicitud String?        @db.VarChar(100)
   fecha_inicio   DateTime?      @db.Date
@@ -102,7 +104,7 @@ model RRHH_solicitud {
 }
 
 model RRHH_usuario {
-  id_usuario    Int            @id
+  id_usuario    Int            @id @default(autoincrement())
   username      String?        @db.VarChar(50)
   password      String?        @db.VarChar(255)
   id_empleado   Int?

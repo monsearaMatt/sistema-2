@@ -1,0 +1,36 @@
+services:
+  # Optional local DB service. Start it by enabling the `localdb` profile
+  # e.g. `COMPOSE_PROFILES=localdb docker-compose up --build`.
+  db:
+    image: postgres:15-alpine
+    profiles:
+      - localdb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - '3000:3000'
+    # Note: do not bind-mount the host backend folder in production
+    # because it will hide the built files inside the image (including /app/dist).
+    # For local development with live-reload you can re-enable a bind mount,
+    # or run the service with a `dev` profile that mounts the source.
+
+  frontend:
+    build: ./frontend/logistica-test
+    depends_on:
+      - backend
+    ports:
+      - '5000:80'
+
+volumes:
+  db_data:
