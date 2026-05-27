@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Prueba GET - Logística</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Prueba GET - Módulo Logística</h1>
+
+    <section class="card small">
+      <h2>Backend</h2>
+      <label>URL del backend
+        <input id="backend-url" type="text" value="http://localhost:3000" />
+      </label>
+      <button type="button" id="fetch-all">Consultar todo</button>
+    </section>
+
+    <pre id="request-status" class="result status"></pre>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Direcciones</h2>
+        <button type="button" data-get="/direcciones">GET /direcciones</button>
+      </div>
+      <pre id="direcciones-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Transportistas</h2>
+        <button type="button" data-get="/transportistas">GET /transportistas</button>
+      </div>
+      <pre id="transportistas-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Pickings (OT)</h2>
+        <button type="button" data-get="/pickings">GET /pickings</button>
+      </div>
+      <pre id="pickings-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>Guías de despacho</h2>
+        <button type="button" data-get="/guias">GET /guias</button>
+      </div>
+      <pre id="guias-result" class="result"></pre>
+    </section>
+
+    <section class="card">
+      <div class="card-header">
+        <h2>KPIs</h2>
+        <div class="btn-group">
+          <button type="button" data-get="/kpis/productividad">GET /kpis/productividad</button>
+          <button type="button" data-get="/kpis/tiempo-despacho">GET /kpis/tiempo-despacho</button>
+        </div>
+      </div>
+      <pre id="kpis-result" class="result"></pre>
+    </section>
+
+    <small class="note">
+      Frontend de consultas. Para crear registros usa
+      <a href="http://localhost:5000" target="_blank" rel="noopener">logistica-test (POST)</a>
+      en el puerto 5000.
+    </small>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.13.2/dist/axios.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

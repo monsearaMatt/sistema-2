@@ -32,5 +32,12 @@ services:
     ports:
       - '5000:80'
 
+  frontend-get:
+    build: ./frontend/logistica-test-get
+    depends_on:
+      - backend
+    ports:
+      - '5001:80'
+
 volumes:
   db_data:

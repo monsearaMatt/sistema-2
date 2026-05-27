@@ -73,9 +73,14 @@
       <pre id="kpi-result" class="result"></pre>
     </section>
 
-    <small class="note">Asegúrate de que el backend esté corriendo en <code>http://localhost:3000</code> y que CORS esté habilitado.</small>
+    <small class="note">
+      Para consultar listados y KPIs (GET) usa
+      <a href="http://localhost:5001" target="_blank" rel="noopener">logistica-test-get</a>
+      en el puerto 5001. Backend: <code>http://localhost:3000</code>.
+    </small>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/axios@1.13.2/dist/axios.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
