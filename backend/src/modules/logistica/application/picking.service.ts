@@ -26,12 +26,17 @@ export class PickingService {
         data: { id_empleado, estado: 'En Proceso' },
       });
     } catch (err) {
-      throw new BadRequestException('No se pudo asignar el empleado. Verifique el id_empleado.');
+      throw new BadRequestException(
+        'No se pudo asignar el empleado. Verifique el id_empleado.',
+      );
     }
   }
 
   async complete(id_ot: number) {
-    return this.prisma.log_picking.update({ where: { id_ot }, data: { estado: 'Completado' } });
+    return this.prisma.log_picking.update({
+      where: { id_ot },
+      data: { estado: 'Completado' },
+    });
   }
 
   async findAll() {

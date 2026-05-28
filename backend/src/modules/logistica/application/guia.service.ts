@@ -14,17 +14,23 @@ export class GuiaService {
         data: {
           // conectamos por relaciones a picking, transportista y direccion
           log_picking: { connect: { id_ot: dto.id_ot } },
-          log_transportista: { connect: { id_transportista: dto.id_transportista } },
+          log_transportista: {
+            connect: { id_transportista: dto.id_transportista },
+          },
           direccion: { connect: { id_direccion: dto.id_direccion } },
           // fecha_emision la deja la BD o se puede dejar en null y el trigger/cliente la llena
         },
       });
     } catch (err) {
-      throw new BadRequestException('Error creando guía de despacho. Verifique referencias.');
+      throw new BadRequestException(
+        'Error creando guía de despacho. Verifique referencias.',
+      );
     }
   }
 
   async findAll() {
-    return this.prisma.log_guia_despacho.findMany({ include: { direccion: true, log_picking: true, log_transportista: true } });
+    return this.prisma.log_guia_despacho.findMany({
+      include: { direccion: true, log_picking: true, log_transportista: true },
+    });
   }
 }

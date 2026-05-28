@@ -1,6 +1,12 @@
 // File: src/modules/logistica/presentation/dto/crear-transportista.dto.ts
 // DTO para crear un transportista en el módulo Logistica
-import { IsInt, IsDefined, IsString, IsNotEmpty, Length } from 'class-validator';
+import {
+  IsInt,
+  IsDefined,
+  IsString,
+  IsNotEmpty,
+  Length,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CrearTransportistaDto {

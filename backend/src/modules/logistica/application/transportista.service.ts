@@ -21,6 +21,8 @@ export class TransportistaService {
 
   async findAll() {
     // Incluir la relación a RRHH_empleado para devolver datos del empleado asociado
-    return this.prisma.log_transportista.findMany({ include: { RRHH_empleado: true } });
+    return this.prisma.log_transportista.findMany({
+      include: { RRHH_empleado: true },
+    });
   }
 }

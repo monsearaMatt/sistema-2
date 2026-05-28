@@ -1,6 +1,13 @@
 // File: src/modules/logistica/presentation/dto/crear-picking.dto.ts
 // DTO para crear y actualizar picking (log_picking)
-import { IsInt, IsOptional, IsPositive, IsDefined, IsString, IsIn } from 'class-validator';
+import {
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsDefined,
+  IsString,
+  IsIn,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CrearPickingDto {

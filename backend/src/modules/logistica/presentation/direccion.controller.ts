@@ -1,6 +1,15 @@
 // File: src/modules/logistica/presentation/direccion.controller.ts
 // Controlador HTTP para Direcciones (Logistica)
-import { Controller, Post, Get, Body, UsePipes, ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UsePipes,
+  ValidationPipe,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { CrearDireccionDto } from './dto/crear-direccion.dto';
 import { DireccionService } from '../application/direccion.service';
 
@@ -14,7 +23,8 @@ export class DireccionController {
     try {
       return await this.direccionService.create(dto);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al crear dirección';
+      const message =
+        err instanceof Error ? err.message : 'Error al crear dirección';
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

@@ -1,6 +1,16 @@
 // File: src/modules/logistica/presentation/picking.controller.ts
 // Controller para operaciones de Picking (OTs)
-import { Controller, Post, Body, Param, Patch, Get, UsePipes, ValidationPipe, ParseIntPipe } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Get,
+  UsePipes,
+  ValidationPipe,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { CrearPickingDto } from './dto/crear-picking.dto';
 import { PickingService } from '../application/picking.service';
 
@@ -15,7 +25,10 @@ export class PickingController {
   }
 
   @Patch(':id/assign')
-  async assign(@Param('id', ParseIntPipe) id: number, @Body('id_empleado', ParseIntPipe) id_empleado: number) {
+  async assign(
+    @Param('id', ParseIntPipe) id: number,
+    @Body('id_empleado', ParseIntPipe) id_empleado: number,
+  ) {
     return this.pickingService.assign(id, id_empleado);
   }
 

@@ -1,6 +1,15 @@
 // File: src/modules/logistica/presentation/transportista.controller.ts
 // Controlador HTTP para Transportistas (Logistica)
-import { Controller, Post, Get, Body, UsePipes, ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UsePipes,
+  ValidationPipe,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { CrearTransportistaDto } from './dto/crear-transportista.dto';
 import { TransportistaService } from '../application/transportista.service';
 
@@ -14,7 +23,8 @@ export class TransportistaController {
     try {
       return await this.transportistaService.create(dto);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error al crear transportista';
+      const message =
+        err instanceof Error ? err.message : 'Error al crear transportista';
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }

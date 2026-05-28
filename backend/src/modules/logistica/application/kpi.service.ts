@@ -17,7 +17,10 @@ export class KpiService {
       },
     });
 
-    return rows.map(r => ({ id_empleado: r.id_empleado, completados: r._count?._all ?? 0 }));
+    return rows.map((r) => ({
+      id_empleado: r.id_empleado,
+      completados: r._count?._all ?? 0,
+    }));
   }
 
   async tiempoMedioDespacho() {
@@ -31,6 +34,9 @@ export class KpiService {
 
     // Resultado depende del driver; normalizar
     const avgSeconds = result?.[0]?.avg_seconds ?? result?.avg_seconds ?? null;
-    return { avg_seconds: avgSeconds, avg_hours: avgSeconds != null ? avgSeconds / 3600 : null };
+    return {
+      avg_seconds: avgSeconds,
+      avg_hours: avgSeconds != null ? avgSeconds / 3600 : null,
+    };
   }
 }
