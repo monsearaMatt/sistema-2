@@ -93,7 +93,7 @@ function mapSolicitud(s: any): SolicitudVacaciones {
     fecha_inicio: inicio.toISOString().split('T')[0],
     fecha_fin: fin.toISOString().split('T')[0],
     dias: Math.ceil((fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24)) + 1,
-    estado: s.estado as EstadoSolicitud,
+    estado: (s.estado as string).toUpperCase() as EstadoSolicitud,
     observaciones: '',
     fecha_solicitud: '',
   };
