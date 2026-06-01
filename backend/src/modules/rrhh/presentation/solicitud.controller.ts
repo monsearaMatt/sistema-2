@@ -30,6 +30,11 @@ export class SolicitudController {
     return this.solicitudService.findAll();
   }
 
+  @Get(':id')
+  async findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.solicitudService.findOne(id);
+  }
+
   @Patch(':id')
   async update(
     @Param('id', ParseIntPipe) id: number,

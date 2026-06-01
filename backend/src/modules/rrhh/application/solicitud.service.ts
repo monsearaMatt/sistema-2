@@ -24,6 +24,19 @@ export class SolicitudService {
     });
   }
 
+  async findOne(id_solicitud: number) {
+    const solicitud = await this.prisma.rRHH_solicitud.findUnique({
+      where: { id_solicitud },
+      include: { RRHH_empleado: true },
+    });
+    if (!solicitud) {
+      throw new NotFoundException(
+        `Solicitud con id ${id_solicitud} no encontrada`,
+      );
+    }
+    return solicitud;
+  }
+
   async findAll() {
     return this.prisma.rRHH_solicitud.findMany({
       include: { RRHH_empleado: true },
