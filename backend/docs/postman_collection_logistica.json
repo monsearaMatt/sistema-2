@@ -1,0 +1,81 @@
+{
+  "info": {
+    "name": "Logistica API - Sprint2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" }
+  ],
+  "item": [
+    {
+      "name": "Transportistas",
+      "item": [
+        {
+          "name": "Create Transportista",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"nombre_transp\": \"Pedro G\",\n  \"patente_vehiculo\": \"ABC123\",\n  \"id_empleado\": 9\n}" },
+            "url": { "raw": "{{baseUrl}}/logistica/transportistas", "host": ["{{baseUrl}}"], "path": ["logistica","transportistas"] }
+          }
+        },
+        {
+          "name": "List Transportistas",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/logistica/transportistas", "host": ["{{baseUrl}}"], "path": ["logistica","transportistas"] } }
+        }
+      ]
+    },
+    {
+      "name": "Direcciones",
+      "item": [
+        {
+          "name": "Create Direccion",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"direccion\": \"Calle Falsa 123\",\n  \"id_cliente\": 1\n}" },
+            "url": { "raw": "{{baseUrl}}/logistica/direcciones", "host": ["{{baseUrl}}"], "path": ["logistica","direcciones"] }
+          }
+        },
+        {
+          "name": "List Direcciones",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/logistica/direcciones", "host": ["{{baseUrl}}"], "path": ["logistica","direcciones"] } }
+        }
+      ]
+    },
+    {
+      "name": "Pickings",
+      "item": [
+        {
+          "name": "Create Picking",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"id_pedido_venta\": 1001\n}" }, "url": { "raw": "{{baseUrl}}/logistica/pickings", "host": ["{{baseUrl}}"], "path": ["logistica","pickings"] } }
+        },
+        {
+          "name": "Assign Picking",
+          "request": { "method": "PATCH", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"id_empleado\": 5\n}" }, "url": { "raw": "{{baseUrl}}/logistica/pickings/1/assign", "host": ["{{baseUrl}}"], "path": ["logistica","pickings","1","assign"] } }
+        },
+        {
+          "name": "Complete Picking",
+          "request": { "method": "PATCH", "url": { "raw": "{{baseUrl}}/logistica/pickings/1/complete", "host": ["{{baseUrl}}"], "path": ["logistica","pickings","1","complete"] } }
+        },
+        {
+          "name": "List Pickings",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/logistica/pickings", "host": ["{{baseUrl}}"], "path": ["logistica","pickings"] } }
+        }
+      ]
+    },
+    {
+      "name": "Guias",
+      "item": [
+        {
+          "name": "Create Guia",
+          "request": { "method": "POST", "header": [{ "key": "Content-Type", "value": "application/json" }], "body": { "mode": "raw", "raw": "{\n  \"id_ot\": 1,\n  \"id_transportista\": 1,\n  \"id_direccion\": 1\n}" }, "url": { "raw": "{{baseUrl}}/logistica/guias", "host": ["{{baseUrl}}"], "path": ["logistica","guias"] } }
+        },
+        {
+          "name": "List Guias",
+          "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/logistica/guias", "host": ["{{baseUrl}}"], "path": ["logistica","guias"] } }
+        }
+      ]
+    }
+  ]
+}

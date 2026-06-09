@@ -12,6 +12,8 @@ import { GuiaController } from './presentation/guia.controller';
 import { GuiaService } from './application/guia.service';
 import { KpiController } from './presentation/kpi.controller';
 import { KpiService } from './application/kpi.service';
+import { ComprasController } from './presentation/compras.controller';
+import ComprasClient from './infrastructure/compras.client';
 
 @Module({
   imports: [PrismaModule],
@@ -21,6 +23,7 @@ import { KpiService } from './application/kpi.service';
     PickingController,
     GuiaController,
     KpiController,
+    ComprasController,
   ],
   providers: [
     DireccionService,
@@ -28,6 +31,7 @@ import { KpiService } from './application/kpi.service';
     PickingService,
     GuiaService,
     KpiService,
+    { provide: 'COMPRAS_CLIENT', useValue: new ComprasClient() },
   ],
   exports: [],
 })

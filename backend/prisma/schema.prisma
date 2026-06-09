@@ -12,37 +12,59 @@ datasource db {
 
 model direccion {
   id_direccion      Int                 @id @default(autoincrement())
-  direccion         String?             @db.VarChar(255)
-  id_cliente        Int?
+  direccion         String              @db.VarChar(255)
+  id_cliente        Int
   log_guia_despacho log_guia_despacho[]
 
   @@schema("Logistica")
+  @@index([id_cliente], map: "idx_direccion_cliente")
 }
 
 model log_guia_despacho {
   id_guia           Int                @id @default(autoincrement())
-  id_ot             Int?
-  id_transportista  Int?
-  id_direccion      Int?
-  fecha_emision     DateTime?          @db.Timestamp(6)
-  direccion         direccion?         @relation(fields: [id_direccion], references: [id_direccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_dir")
-  log_picking       log_picking?       @relation(fields: [id_ot], references: [id_ot], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_ot")
-  log_transportista log_transportista? @relation(fields: [id_transportista], references: [id_transportista], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_transp")
+  id_ot             Int
+  id_transportista  Int
+  id_direccion      Int
+  fecha_emision     DateTime           @default(now()) @db.Timestamp(6)
+  direccion         direccion          @relation(fields: [id_direccion], references: [id_direccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_dir")
+  log_picking       log_picking        @relation(fields: [id_ot], references: [id_ot], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_ot")
+  log_transportista log_transportista  @relation(fields: [id_transportista], references: [id_transportista], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_transp")
 
   @@schema("Logistica")
+  @@index([id_ot], map: "idx_guia_ot")
+  @@index([id_transportista], map: "idx_guia_transportista")
+  @@index([id_direccion], map: "idx_guia_direccion")
 }
 
 model log_picking {
   id_ot             Int                 @id @default(autoincrement())
   id_pedido_venta   Int?
   id_empleado       Int?
-  fecha_creacion    DateTime?           @db.Timestamp(6)
-  estado            String?             @db.VarChar(50)
+  id_ruta           Int?
+  fecha_creacion    DateTime            @default(now()) @db.Timestamp(6)
+  estado            String              @default("Pendiente") @db.VarChar(50)
   log_guia_despacho log_guia_despacho[]
   RRHH_empleado     RRHH_empleado?      @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_picking_empleado")
+  ruta              ruta?               @relation(fields: [id_ruta], references: [id_ruta], onDelete: NoAction, onUpdate: NoAction, map: "fk_picking_ruta")
 
   @@schema("Logistica")
+  @@index([id_pedido_venta], map: "idx_picking_pedido_venta")
+  @@index([id_empleado], map: "idx_picking_empleado")
+  @@index([id_ruta], map: "idx_picking_ruta")
 }
+
+model ruta {
+  id_ruta        Int         @id @default(autoincrement())
+  nombre         String      @db.VarChar(100)
+  descripcion    String?     @db.VarChar(255)
+  fecha_creacion DateTime    @default(now()) @db.Timestamp(6)
+  estado         String      @default("Activa") @db.VarChar(50)
+  log_picking    log_picking[]
+
+  @@schema("Logistica")
+  @@index([nombre], map: "idx_ruta_nombre")
+}
+
 
 model log_recepcion {
   id_recepcion    Int            @id @default(autoincrement())
@@ -56,13 +78,14 @@ model log_recepcion {
 
 model log_transportista {
   id_transportista  Int                 @id @default(autoincrement())
-  nombre_transp     String?             @db.VarChar(100)
-  patente_vehiculo  String?             @db.VarChar(10)
-  id_empleado       Int?
+  nombre_transp     String              @db.VarChar(100)
+  patente_vehiculo  String              @unique @db.VarChar(10)
+  id_empleado       Int
   log_guia_despacho log_guia_despacho[]
-  RRHH_empleado     RRHH_empleado?      @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_transp_empleado")
+  RRHH_empleado     RRHH_empleado       @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_transp_empleado")
 
   @@schema("Logistica")
+  @@index([id_empleado], map: "idx_transportista_empleado")
 }
 
 model RRHH_empleado {

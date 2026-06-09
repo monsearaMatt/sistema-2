@@ -8,17 +8,17 @@ export class CrearGuiaDespachoDto {
   @Type(() => Number)
   @IsInt()
   @IsPositive()
-  id_ot: number;
+  id_ot!: number;
 
   @IsDefined()
   @Type(() => Number)
   @IsInt()
   @IsPositive()
-  id_transportista: number;
+  id_transportista!: number;
 
   @IsDefined()
   @Type(() => Number)
   @IsInt()
   @IsPositive()
-  id_direccion: number;
+  id_direccion!: number;
 }

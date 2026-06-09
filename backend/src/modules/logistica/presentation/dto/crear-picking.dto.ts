@@ -4,14 +4,13 @@ import {
   IsInt,
   IsOptional,
   IsPositive,
-  IsDefined,
   IsString,
   IsIn,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CrearPickingDto {
-  @IsDefined()
+  @IsOptional()
   @Type(() => Number)
   @IsInt()
   @IsPositive()
