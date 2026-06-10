@@ -15,7 +15,7 @@ export class SolicitudService {
         tipo_solicitud: dto.tipo_solicitud,
         fecha_inicio,
         fecha_fin,
-        estado: dto.estado ?? 'Pendiente',
+        estado: dto.estado ?? 'PENDIENTE',
       },
       include: { RRHH_empleado: true },
     });

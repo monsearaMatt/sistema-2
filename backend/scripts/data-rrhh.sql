@@ -26,14 +26,14 @@ INSERT INTO "RRHH"."RRHH_empleado" (id_empleado, rut, nombre, id_rol, correo, te
 
 -- ========== SOLICITUDES (RRHH schema) ==========
 INSERT INTO "RRHH"."RRHH_solicitud" (id_solicitud, id_empleado, tipo_solicitud, fecha_inicio, fecha_fin, estado) VALUES
-(1, 1, 'Vacaciones', '2026-06-10', '2026-06-20', 'Pendiente'),
-(2, 3, 'Vacaciones', '2026-07-01', '2026-07-14', 'Pendiente'),
-(3, 6, 'Vacaciones', '2026-06-03', '2026-06-07', 'Aprobada'),
-(4, 4, 'Vacaciones', '2026-05-26', '2026-05-30', 'Rechazada'),
-(5, 7, 'Vacaciones', '2026-08-01', '2026-08-15', 'Pendiente'),
-(6, 2, 'Permiso', '2026-06-05', '2026-06-05', 'Aprobada'),
-(7, 5, 'Permiso', '2026-06-08', '2026-06-08', 'Pendiente'),
-(8, 8, 'Vacaciones', '2026-06-15', '2026-06-25', 'Pendiente');
+(1, 1, 'Vacaciones', '2026-06-10', '2026-06-20', 'PENDIENTE'),
+(2, 3, 'Vacaciones', '2026-07-01', '2026-07-14', 'PENDIENTE'),
+(3, 6, 'Vacaciones', '2026-06-03', '2026-06-07', 'APROBADA'),
+(4, 4, 'Vacaciones', '2026-05-26', '2026-05-30', 'RECHAZADA'),
+(5, 7, 'Vacaciones', '2026-08-01', '2026-08-15', 'PENDIENTE'),
+(6, 2, 'Permiso', '2026-06-05', '2026-06-05', 'APROBADA'),
+(7, 5, 'Permiso', '2026-06-08', '2026-06-08', 'PENDIENTE'),
+(8, 8, 'Vacaciones', '2026-06-15', '2026-06-25', 'PENDIENTE');
 
 -- ========== USUARIOS (RRHH schema) ==========
 -- login: RUT, password: RUT

@@ -34,7 +34,7 @@ export class CrearEmpleadoDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['Activo', 'Inactivo', 'Licencia'])
+  @IsIn(['ACTIVO', 'INACTIVO', 'LICENCIA', 'Activo', 'Inactivo', 'Licencia'])
   estado?: string;
 }
 
@@ -59,6 +59,6 @@ export class ActualizarEmpleadoDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['Activo', 'Inactivo', 'Licencia'])
+  @IsIn(['ACTIVO', 'INACTIVO', 'LICENCIA', 'Activo', 'Inactivo', 'Licencia'])
   estado?: string;
 }

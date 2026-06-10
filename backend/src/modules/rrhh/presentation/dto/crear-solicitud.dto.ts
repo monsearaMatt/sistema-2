@@ -31,7 +31,7 @@ export class CrearSolicitudDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(['Pendiente', 'Aprobada', 'Rechazada'])
+  @IsIn(['PENDIENTE', 'APROBADA', 'RECHAZADA'])
   estado?: string;
 }
 
@@ -51,6 +51,6 @@ export class ActualizarSolicitudDto {
 
   @IsDefined()
   @IsString()
-  @IsIn(['Pendiente', 'Aprobada', 'Rechazada'])
+  @IsIn(['PENDIENTE', 'APROBADA', 'RECHAZADA'])
   estado: string;
 }
