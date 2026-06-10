@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, Suspense } from "react";
+import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { useSearchParams } from "next/navigation";
 import type { ElementType, ReactNode } from "react";
 import {
@@ -164,6 +165,7 @@ interface MovimientoApi {
 }
 
 function LogisticaPageContent() {
+  const { listo } = useAuthGuard(["Jefe de Logística", "Operador de Bodega", "Admin Sistema"]);
   const searchParams = useSearchParams();
   const tabParam = searchParams.get("tab") || "despacho";
   const subParam = searchParams.get("sub") || "";
@@ -359,6 +361,14 @@ function LogisticaPageContent() {
     if (kpiProductividad.length === 0) return 1;
     return Math.max(...kpiProductividad.map(p => p.completados), 1);
   }, [kpiProductividad]);
+
+  if (!listo) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+        Cargando módulo de logística...
+      </div>
+    );
+  }
 
   return (
     <DashboardLayout>

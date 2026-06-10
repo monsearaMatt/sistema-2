@@ -1,8 +1,16 @@
-import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Post, UsePipes, ValidationPipe, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { IsNotEmpty } from 'class-validator';
 
 class LoginDto {
+  @IsNotEmpty()
+  username!: string;
+
+  @IsNotEmpty()
+  password!: string;
+}
+
+class RegisterDto {
   @IsNotEmpty()
   username!: string;
 
@@ -19,8 +27,13 @@ export class AuthController {
   async login(@Body() dto: LoginDto) {
     const user = await this.authService.validateUser(dto.username, dto.password);
     if (!user) {
-      return { status: 'error', message: 'Invalid credentials' };
+      throw new UnauthorizedException('Usuario o contraseña incorrectos.');
     }
     return this.authService.login(user);
+  }
+
+  @Post('register')
+  async register(@Body() dto: RegisterDto) {
+    return this.authService.register(dto.username, dto.password);
   }
 }

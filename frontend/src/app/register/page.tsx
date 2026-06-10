@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function RegisterPage() {
-    const [rut, setRut] = useState("");
+    const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [errorMsg, setErrorMsg] = useState("");
@@ -26,7 +26,7 @@ export default function RegisterPage() {
     const enviar = (e: SyntheticEvent) => {
         e.preventDefault();
         setErrorMsg("");
-        registrar.mutate({rut, password });
+        registrar.mutate({ username, password });
     };
 
     return (
@@ -61,18 +61,18 @@ export default function RegisterPage() {
 
                     <form onSubmit={enviar} className="space-y-4">
                         <div className="space-y-2">
-                            <label htmlFor="rut" className="text-sm font-medium text-foreground">
-                                Rut
+                            <label htmlFor="username" className="text-sm font-medium text-foreground">
+                                Usuario
                             </label>
                             <Input
                                 type="text"
-                                id="rut"
-                                name="rut"
+                                id="username"
+                                name="username"
                                 required
-                                value={rut}
-                                onChange={(e) => setRut(e.target.value)}
-                                placeholder="Ingrese su Rut"
-                                autoComplete="rut"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                placeholder="Ingrese su nombre de usuario"
+                                autoComplete="username"
                             />
                         </div>
 

@@ -22,7 +22,19 @@ export default function LoginPage() {
         async (data) => {
             setToken(data.access_token);
             setUsertipo(data.user.tipo);
-            router.push("/dashboard");
+            
+            const searchParams = new URLSearchParams(window.location.search);
+            const redirectUrl = searchParams.get("redirect");
+            if (redirectUrl) {
+                router.push(redirectUrl);
+            } else {
+                const tipo = data.user.tipo;
+                if (["Jefe de Logística", "Operador de Bodega", "Admin Sistema"].includes(tipo)) {
+                    router.push("/Logistica");
+                } else {
+                    router.push("/RRHH");
+                }
+            }
         },
         (_error) => {
             setErrorMsg("Usuario o contraseña incorrectos.");

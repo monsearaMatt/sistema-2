@@ -1,27 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * proxy.ts — Protección de rutas y redirección por rol
+ * proxy.ts (Next.js 16 Proxy)
  *
+ * Protege las rutas del sistema según rol del usuario.
  * Lee las cookies "token" y "tipoUser" que setea el AuthContext tras el login.
- *
- * Lógica:
- *   - Sin token → redirige a /login
- *   - Con token en ruta pública (/, /login, /register) → redirige al módulo
- *   - /RRHH sin rol permitido → redirige a /Logistica
- *   - /Logistica sin rol permitido → redirige a /RRHH
  */
 
 const RUTAS_PUBLICAS = ["/", "/login", "/register"];
 
+// Roles con acceso a cada módulo
 const ROLES_RRHH = ["Admin RRHH", "Admin Sistema", "Empleado"];
 const ROLES_LOG  = ["Jefe de Logística", "Operador de Bodega", "Admin Sistema"];
 
-function redirectByRole(tipo: string | undefined, request: NextRequest): NextResponse {
-  if (!tipo) return NextResponse.redirect(new URL("/login", request.url));
+function redirectByRole(tipo: string | undefined, request: NextRequest) {
+  if (!tipo) {
+    // Si hay token pero no se ha cargado el tipo, dejamos pasar al cliente para evitar loops infinitos
+    return NextResponse.next();
+  }
+  // Roles exclusivos de Logística → van a Logística
   if (ROLES_LOG.includes(tipo) && !ROLES_RRHH.includes(tipo)) {
     return NextResponse.redirect(new URL("/Logistica", request.url));
   }
+  // El resto (Admin RRHH, Empleado, Admin Sistema) → van a RRHH
   return NextResponse.redirect(new URL("/RRHH", request.url));
 }
 
@@ -34,7 +35,7 @@ export function proxy(request: NextRequest) {
 
   if (!token && !esPublica) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("redirect", pathname);
+    loginUrl.searchParams.set("redirect", pathname); 
     return NextResponse.redirect(loginUrl);
   }
 
@@ -43,13 +44,13 @@ export function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith("/RRHH") && token) {
-    if (!ROLES_RRHH.includes(tipo ?? "")) {
+    if (tipo && !ROLES_RRHH.includes(tipo)) {
       return NextResponse.redirect(new URL("/Logistica", request.url));
     }
   }
 
   if (pathname.startsWith("/Logistica") && token) {
-    if (!ROLES_LOG.includes(tipo ?? "")) {
+    if (tipo && !ROLES_LOG.includes(tipo)) {
       return NextResponse.redirect(new URL("/RRHH", request.url));
     }
   }
@@ -58,5 +59,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next|favicon.ico|api).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|api).*)"],
 };

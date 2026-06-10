@@ -20,7 +20,7 @@ interface Loginresponse {
 
 export function useLogin(onSuccess: (data: Loginresponse)=> void, onError:(error:Error)=> void) {
     return useMutation<Loginresponse,AxiosError,Logindata>({ mutationFn: async ({username, password}: Logindata): Promise<Loginresponse> => {
-            const respuesta = await api.post('/auth/login', {username, password});
+            const respuesta = await api.post('/rrhh/auth/login', {username, password});
             return respuesta.data;
         },
         onSuccess: (data) => {
