@@ -14,8 +14,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 const RUTAS_PUBLICAS = ["/", "/login", "/register"];
 
-const ROLES_RRHH = ["Admin RRHH", "Admin Sistema", "Empleado"];
-const ROLES_LOG  = ["Jefe de Logística", "Operador de Bodega", "Admin Sistema"];
+const ROLES_RRHH = ["Admin RRHH", "Admin Sistema"];
+const ROLES_LOG  = ["Jefe de Logística", "Operador de Bodega", "Admin Sistema", "Empleado"];
 
 function redirectByRole(tipo: string | undefined, request: NextRequest): NextResponse {
   if (!tipo) return NextResponse.redirect(new URL("/login", request.url));

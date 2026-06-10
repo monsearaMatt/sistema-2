@@ -8,7 +8,9 @@ import {
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../../common/auth/jwt-auth.guard';
 import {
   CrearSolicitudDto,
   ActualizarSolicitudDto,
@@ -21,6 +23,7 @@ export class SolicitudController {
   constructor(private readonly solicitudService: SolicitudService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async create(@Body() dto: CrearSolicitudDto) {
     return this.solicitudService.create(dto);
   }
@@ -36,6 +39,7 @@ export class SolicitudController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ActualizarSolicitudDto,

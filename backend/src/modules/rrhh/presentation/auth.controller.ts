@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Post, UsePipes, ValidationPipe, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { IsNotEmpty } from 'class-validator';
@@ -31,12 +31,16 @@ export class AuthController {
   async login(@Body() dto: LoginDto) {
     const user = await this.authService.validateUser(dto.rut, dto.password);
     if (!user) {
-      return { status: 'error', message: 'Invalid credentials' };
+      throw new UnauthorizedException('RUT o contraseña incorrectos');
     }
     const token = await this.authService.login(user);
+    const empleado = await this.prisma.rRHH_empleado.findUnique({
+      where: { id_empleado: user.id_empleado ?? undefined },
+      include: { RRHH_rol: true },
+    });
     return {
       access_token: token.access_token,
-      user: { tipo: user.RRHH_empleado?.RRHH_rol?.name_rol ?? 'Empleado' },
+      user: { tipo: empleado?.RRHH_rol?.name_rol ?? 'Empleado' },
       statusCode: 200,
       success: true,
     };

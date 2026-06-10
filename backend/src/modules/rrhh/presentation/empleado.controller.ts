@@ -9,7 +9,9 @@ import {
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../../common/auth/jwt-auth.guard';
 import {
   CrearEmpleadoDto,
   ActualizarEmpleadoDto,
@@ -22,6 +24,7 @@ export class EmpleadoController {
   constructor(private readonly empleadoService: EmpleadoService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async create(@Body() dto: CrearEmpleadoDto) {
     return this.empleadoService.create(dto);
   }
@@ -37,6 +40,7 @@ export class EmpleadoController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard)
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ActualizarEmpleadoDto,
@@ -45,11 +49,13 @@ export class EmpleadoController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.empleadoService.remove(id);
   }
 
   @Patch(':id/desactivar')
+  @UseGuards(JwtAuthGuard)
   async desactivar(@Param('id', ParseIntPipe) id: number) {
     await this.empleadoService.remove(id);
     return { message: 'Empleado desactivado.' };
