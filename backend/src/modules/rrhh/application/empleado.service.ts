@@ -18,6 +18,18 @@ export class EmpleadoService {
       },
       include: { RRHH_rol: true },
     });
+    const existingUser = await this.prisma.rRHH_usuario.findFirst({
+      where: { id_empleado: empleado.id_empleado },
+    });
+    if (!existingUser) {
+      await this.prisma.rRHH_usuario.create({
+        data: {
+          username: dto.rut,
+          password: dto.rut,
+          id_empleado: empleado.id_empleado,
+        },
+      });
+    }
     return this.toFrontend(empleado);
   }
 

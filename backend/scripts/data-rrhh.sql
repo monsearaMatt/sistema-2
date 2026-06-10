@@ -36,11 +36,20 @@ INSERT INTO "RRHH"."RRHH_solicitud" (id_solicitud, id_empleado, tipo_solicitud, 
 (8, 8, 'Vacaciones', '2026-06-15', '2026-06-25', 'Pendiente');
 
 -- ========== USUARIOS (RRHH schema) ==========
+-- login: RUT, password: RUT
 INSERT INTO "RRHH"."RRHH_usuario" (id_usuario, username, password, id_empleado) VALUES
-(1, 'criquelme', 'changeme123', 1),
-(2, 'mgonzalez', 'changeme123', 2),
-(3, 'jvargas', 'changeme123', 3),
-(4, 'rsilva', 'changeme123', 5);
+(1, '12345678-9', '12345678-9', 1),
+(2, '98765432-1', '98765432-1', 2),
+(3, '11223344-5', '11223344-5', 3),
+(4, '55667788-K', '55667788-K', 4),
+(5, '33445566-7', '33445566-7', 5),
+(6, '77889900-2', '77889900-2', 6),
+(7, '22334455-6', '22334455-6', 7),
+(8, '44556677-3', '44556677-3', 8),
+(9, '11334455-8', '11334455-8', 9),
+(10, '22887766-0', '22887766-0', 10),
+(11, '33552211-4', '33552211-4', 11),
+(12, '44112233-9', '44112233-9', 12);
 
 -- ========== VERIFICACIONES ==========
 SELECT 'RRHH_rol' as tabla, COUNT(*) as count FROM "RRHH"."RRHH_rol"
