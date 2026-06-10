@@ -1,16 +1,19 @@
-// File: src/modules/logistica/presentation/transportista.controller.ts
-// Controlador HTTP para Transportistas (Logistica)
 import {
   Controller,
   Post,
   Get,
+  Patch,
+  Delete,
+  Param,
   Body,
   UsePipes,
   ValidationPipe,
   HttpException,
   HttpStatus,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { CrearTransportistaDto } from './dto/crear-transportista.dto';
+import { ActualizarTransportistaDto } from './dto/actualizar-transportista.dto';
 import { TransportistaService } from '../application/transportista.service';
 
 @Controller('logistica/transportistas')
@@ -32,5 +35,27 @@ export class TransportistaController {
   @Get()
   async findAll() {
     return await this.transportistaService.findAll();
+  }
+
+  @Patch(':id')
+  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: ActualizarTransportistaDto) {
+    try {
+      return await this.transportistaService.update(id, dto);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Error al actualizar transportista';
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Delete(':id')
+  async remove(@Param('id', ParseIntPipe) id: number) {
+    try {
+      return await this.transportistaService.remove(id);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Error al eliminar transportista';
+      throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

@@ -13,6 +13,7 @@
 
 import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ProveedorAuth } from "../context/AuthContext";
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(
@@ -20,7 +21,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       new QueryClient({
         defaultOptions: {
           queries: {
-
             staleTime: 1000 * 60, 
             retry: (failureCount, error: any) => {
               if (error?.response?.status >= 400 && error?.response?.status < 500) {
@@ -35,7 +35,9 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={queryClient}>
-      {children}
+      <ProveedorAuth>
+        {children}
+      </ProveedorAuth>
     </QueryClientProvider>
   );
 }

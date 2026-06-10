@@ -9,9 +9,13 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   try {
-    console.log("=== ALL INVENTARIO PRODUCTS ===");
-    const productos = await prisma.producto.findMany({});
-    console.log(JSON.stringify(productos, null, 2));
+    console.log("=== ALL COMPRAS ORDERS ===");
+    const ordenes = await prisma.ordenCompra.findMany({
+      include: {
+        Detalle_OC: true,
+      }
+    });
+    console.log(JSON.stringify(ordenes, null, 2));
   } catch (err) {
     console.error(err);
   } finally {

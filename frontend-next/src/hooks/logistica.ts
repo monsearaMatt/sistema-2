@@ -5,15 +5,28 @@ function asArray<T>(data: unknown): T[] {
   return Array.isArray(data) ? data : [];
 }
 
+// ─── TYPES ────────────────────────────────────────────────────────────────────
+
 export interface CrearTransportistaPayload {
   nombre_transp: string;
   patente_vehiculo: string;
   id_empleado: number;
 }
 
+export interface ActualizarTransportistaPayload {
+  nombre_transp?: string;
+  patente_vehiculo?: string;
+  id_empleado?: number;
+}
+
 export interface CrearDireccionPayload {
   direccion: string;
   id_cliente: number;
+}
+
+export interface ActualizarDireccionPayload {
+  direccion?: string;
+  id_cliente?: number;
 }
 
 export interface CrearPickingPayload {
@@ -26,6 +39,13 @@ export interface CrearGuiaPayload {
   id_transportista: number;
   id_direccion: number;
 }
+
+export interface CrearRecepcionPayload {
+  id_orden_compra: string;
+  id_empleado: number;
+}
+
+// ─── TRANSPORTISTAS (CRUD) ───────────────────────────────────────────────────
 
 export function useTransportistas() {
   return useQuery({
@@ -50,6 +70,34 @@ export function useCrearTransportista() {
   });
 }
 
+export function useActualizarTransportista() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: ActualizarTransportistaPayload }) => {
+      const { data } = await api.patch(`/logistica/transportistas/${id}`, payload);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'transportistas'] });
+    },
+  });
+}
+
+export function useEliminarTransportista() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const { data } = await api.delete(`/logistica/transportistas/${id}`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'transportistas'] });
+    },
+  });
+}
+
+// ─── DIRECCIONES (CRUD) ───────────────────────────────────────────────────────
+
 export function useDirecciones() {
   return useQuery({
     queryKey: ['logistica', 'direcciones'],
@@ -72,6 +120,34 @@ export function useCrearDireccion() {
     },
   });
 }
+
+export function useActualizarDireccion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, payload }: { id: number; payload: ActualizarDireccionPayload }) => {
+      const { data } = await api.patch(`/logistica/direcciones/${id}`, payload);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'direcciones'] });
+    },
+  });
+}
+
+export function useEliminarDireccion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const { data } = await api.delete(`/logistica/direcciones/${id}`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'direcciones'] });
+    },
+  });
+}
+
+// ─── PICKINGS & DESPACHOS ────────────────────────────────────────────────────
 
 export function usePickings() {
   return useQuery({
@@ -122,6 +198,24 @@ export function useCompletarPicking() {
   });
 }
 
+export function useConfirmarDespacho() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const { data } = await api.post(`/logistica/pickings/${id}/confirm-dispatch`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'pickings'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'ventas', 'pedidos'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'maestros', 'productos'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'inventario', 'movimientos'] });
+    },
+  });
+}
+
+// ─── GUIAS DE DESPACHO ────────────────────────────────────────────────────────
+
 export function useGuias() {
   return useQuery({
     queryKey: ['logistica', 'guias'],
@@ -144,6 +238,8 @@ export function useCrearGuia() {
     },
   });
 }
+
+// ─── AUXILIAR MAESTROS & RRHH ───────────────────────────────────────────────
 
 export function useEmpleados() {
   return useQuery({
@@ -181,6 +277,99 @@ export function useMaestroProveedores() {
     queryFn: async () => {
       const { data } = await api.get('/logistica/maestros/proveedores');
       return asArray(data);
+    },
+  });
+}
+
+// ─── INTEGRACION DE BACKENDS ──────────────────────────────────────────────────
+
+export function useVentasPedidos() {
+  return useQuery({
+    queryKey: ['logistica', 'ventas', 'pedidos'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/ventas/pedidos');
+      return asArray(data);
+    },
+  });
+}
+
+export function useComprasOrdenes() {
+  return useQuery({
+    queryKey: ['logistica', 'compras', 'ordenes'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/compras/ordenes');
+      return asArray(data);
+    },
+  });
+}
+
+export function useRecepciones() {
+  return useQuery({
+    queryKey: ['logistica', 'recepciones'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/recepciones');
+      return asArray(data);
+    },
+  });
+}
+
+export function useCrearRecepcion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (payload: CrearRecepcionPayload) => {
+      const { data } = await api.post('/logistica/recepciones', payload);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'recepciones'] });
+    },
+  });
+}
+
+export function useConfirmarRecepcion() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const { data } = await api.post(`/logistica/recepciones/${id}/confirm-receipt`);
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'recepciones'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'compras', 'ordenes'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'maestros', 'productos'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'inventario', 'movimientos'] });
+    },
+  });
+}
+
+export function useMovimientosInventario() {
+  return useQuery({
+    queryKey: ['logistica', 'inventario', 'movimientos'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/maestros/movimientos');
+      return asArray(data);
+    },
+  });
+}
+
+// ─── KPIS ────────────────────────────────────────────────────────────────────
+
+export function useKpiProductividad() {
+  return useQuery({
+    queryKey: ['logistica', 'kpis', 'productividad'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/kpis/productividad');
+      return asArray(data);
+    },
+  });
+}
+
+export function useKpiTiempoDespacho() {
+  return useQuery({
+    queryKey: ['logistica', 'kpis', 'tiempo-despacho'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/kpis/tiempo-despacho');
+      return data as { promedio_horas: number | null };
     },
   });
 }

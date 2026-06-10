@@ -20,6 +20,11 @@ export class MaestrosController {
     return this.maestros.listProveedores();
   }
 
+  @Get('movimientos')
+  async listMovimientos() {
+    return this.maestros.listMovimientos();
+  }
+
   @Get('producto/:id')
   async getProducto(@Param('id') id: string) {
     return this.maestros.getProducto(id);

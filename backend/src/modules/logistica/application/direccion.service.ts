@@ -21,4 +21,21 @@ export class DireccionService {
   async findAll() {
     return this.prisma.direccion.findMany();
   }
+
+  async update(id_direccion: number, dto: any) {
+    const data: any = {};
+    if (dto.direccion !== undefined) data.direccion = dto.direccion;
+    if (dto.id_cliente !== undefined) data.id_cliente = dto.id_cliente;
+
+    return this.prisma.direccion.update({
+      where: { id_direccion },
+      data,
+    });
+  }
+
+  async remove(id_direccion: number) {
+    return this.prisma.direccion.delete({
+      where: { id_direccion },
+    });
+  }
 }
