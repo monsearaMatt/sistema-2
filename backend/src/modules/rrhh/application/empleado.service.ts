@@ -1,16 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-import {
-  CrearEmpleadoDto,
-  ActualizarEmpleadoDto,
-} from '../presentation/dto/crear-empleado.dto';
+import { CrearEmpleadoDto, ActualizarEmpleadoDto } from '../presentation/dto/crear-empleado.dto';
 
 @Injectable()
 export class EmpleadoService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CrearEmpleadoDto) {
-    return this.prisma.rRHH_empleado.create({
+    const empleado = await this.prisma.rRHH_empleado.create({
       data: {
         rut: dto.rut,
         nombre: dto.nombre,
@@ -21,12 +18,14 @@ export class EmpleadoService {
       },
       include: { RRHH_rol: true },
     });
+    return this.toFrontend(empleado);
   }
 
   async findAll() {
-    return this.prisma.rRHH_empleado.findMany({
+    const empleados = await this.prisma.rRHH_empleado.findMany({
       include: { RRHH_rol: true },
     });
+    return empleados.map((e) => this.toFrontend(e));
   }
 
   async findOne(id_empleado: number) {
@@ -35,11 +34,9 @@ export class EmpleadoService {
       include: { RRHH_rol: true },
     });
     if (!empleado) {
-      throw new NotFoundException(
-        `Empleado con id ${id_empleado} no encontrado`,
-      );
+      throw new NotFoundException(`Empleado con id ${id_empleado} no encontrado`);
     }
-    return empleado;
+    return this.toFrontend(empleado);
   }
 
   async update(id_empleado: number, dto: ActualizarEmpleadoDto) {
@@ -58,19 +55,34 @@ export class EmpleadoService {
     if (dto.id_rol !== undefined) {
       data.RRHH_rol = { connect: { id_rol: dto.id_rol } };
     }
-    return this.prisma.rRHH_empleado.update({
+    const empleado = await this.prisma.rRHH_empleado.update({
       where: { id_empleado },
       data,
       include: { RRHH_rol: true },
     });
+    return this.toFrontend(empleado);
   }
 
   async remove(id_empleado: number) {
     await this.findOne(id_empleado);
-    return this.prisma.rRHH_empleado.update({
+    const empleado = await this.prisma.rRHH_empleado.update({
       where: { id_empleado },
       data: { estado: 'Inactivo' },
       include: { RRHH_rol: true },
     });
+    return this.toFrontend(empleado);
+  }
+
+  private toFrontend(e: any) {
+    return {
+      id_empleado: String(e.id_empleado),
+      rut: e.rut,
+      nombre: e.nombre,
+      id_rol: e.id_rol,
+      correo: e.correo,
+      telefono: e.telefono,
+      estado: e.estado === 'Inactivo' ? 'INACTIVO' : 'ACTIVO',
+      name_rol: e.RRHH_rol?.name_rol ?? '',
+    };
   }
 }
