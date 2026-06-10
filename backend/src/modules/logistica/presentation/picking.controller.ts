@@ -10,6 +10,7 @@ import {
   UsePipes,
   ValidationPipe,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { CrearPickingDto } from './dto/crear-picking.dto';
 import { PickingService } from '../application/picking.service';
@@ -20,6 +21,9 @@ export class PickingController {
   constructor(private readonly pickingService: PickingService) {}
 
   @Post()
+  @UseGuards(require('../../../common/auth/jwt-auth.guard').JwtAuthGuard, require('../../../common/auth/roles.guard').RolesGuard)
+  // allow both Jefe de Logística and Admin Sistema to create pickings
+  // note: using require() so decorators resolve without circular import issues in this code-edit context
   async create(@Body() dto: CrearPickingDto) {
     return this.pickingService.create(dto);
   }

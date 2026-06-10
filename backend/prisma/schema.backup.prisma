@@ -1,0 +1,169 @@
+// Generate the client directly into node_modules so the runtime loads the
+// generated client instead of the installed @prisma/client package.
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Todos los esquemas de la base conjunta (ver pgAdmin → Esquemas).
+  // Para importar tablas reales: npm run prisma:pull (requiere DATABASE_URL en .env)
+  schemas  = ["Compras", "Inventario", "Logistica", "RRHH", "SI1", "SIA", "Ventas", "Maestros"]
+}
+
+model direccion {
+  id_direccion      Int                 @id @default(autoincrement())
+  direccion         String              @db.VarChar(255)
+  id_cliente        Int
+  log_guia_despacho log_guia_despacho[]
+
+  @@schema("Logistica")
+  @@index([id_cliente], map: "idx_direccion_cliente")
+}
+
+model log_guia_despacho {
+  id_guia           Int                @id @default(autoincrement())
+  id_ot             Int
+  id_transportista  Int
+  id_direccion      Int
+  fecha_emision     DateTime           @default(now()) @db.Timestamp(6)
+  direccion         direccion          @relation(fields: [id_direccion], references: [id_direccion], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_dir")
+  log_picking       log_picking        @relation(fields: [id_ot], references: [id_ot], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_ot")
+  log_transportista log_transportista  @relation(fields: [id_transportista], references: [id_transportista], onDelete: NoAction, onUpdate: NoAction, map: "fk_guia_transp")
+
+  @@schema("Logistica")
+  @@index([id_ot], map: "idx_guia_ot")
+  @@index([id_transportista], map: "idx_guia_transportista")
+  @@index([id_direccion], map: "idx_guia_direccion")
+}
+
+model log_picking {
+  id_ot             Int                 @id @default(autoincrement())
+  id_pedido_venta   Int?
+  id_empleado       Int?
+  id_ruta           Int?
+  fecha_creacion    DateTime            @default(now()) @db.Timestamp(6)
+  estado            String              @default("Pendiente") @db.VarChar(50)
+  log_guia_despacho log_guia_despacho[]
+  RRHH_empleado     RRHH_empleado?      @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_picking_empleado")
+  ruta              ruta?               @relation(fields: [id_ruta], references: [id_ruta], onDelete: NoAction, onUpdate: NoAction, map: "fk_picking_ruta")
+
+  @@schema("Logistica")
+  @@index([id_pedido_venta], map: "idx_picking_pedido_venta")
+  @@index([id_empleado], map: "idx_picking_empleado")
+  @@index([id_ruta], map: "idx_picking_ruta")
+}
+
+model ruta {
+  id_ruta        Int         @id @default(autoincrement())
+  nombre         String      @db.VarChar(100)
+  descripcion    String?     @db.VarChar(255)
+  fecha_creacion DateTime    @default(now()) @db.Timestamp(6)
+  estado         String      @default("Activa") @db.VarChar(50)
+  log_picking    log_picking[]
+
+  @@schema("Logistica")
+  @@index([nombre], map: "idx_ruta_nombre")
+}
+
+
+model log_recepcion {
+  id_recepcion    Int            @id @default(autoincrement())
+  id_orden_compra Int?
+  id_empleado     Int?
+  fecha_recepcion DateTime?      @db.Timestamp(6)
+  RRHH_empleado   RRHH_empleado? @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_recepcion_empleado")
+
+  @@schema("Logistica")
+}
+
+model log_transportista {
+  id_transportista  Int                 @id @default(autoincrement())
+  nombre_transp     String              @db.VarChar(100)
+  patente_vehiculo  String              @unique @db.VarChar(10)
+  id_empleado       Int
+  log_guia_despacho log_guia_despacho[]
+  RRHH_empleado     RRHH_empleado       @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_transp_empleado")
+
+  @@schema("Logistica")
+  @@index([id_empleado], map: "idx_transportista_empleado")
+}
+
+model RRHH_empleado {
+  id_empleado       Int                 @id @default(autoincrement())
+  rut               String?             @db.VarChar(12)
+  nombre            String?             @db.VarChar(100)
+  id_rol            Int?
+  correo            String?             @db.VarChar(100)
+  telefono          String?             @db.VarChar(20)
+  estado            String?             @db.VarChar(50)
+  log_picking       log_picking[]
+  log_recepcion     log_recepcion[]
+  log_transportista log_transportista[]
+  RRHH_rol          RRHH_rol?           @relation(fields: [id_rol], references: [id_rol], onDelete: NoAction, onUpdate: NoAction, map: "fk_empleado_rol")
+  RRHH_solicitud    RRHH_solicitud[]
+  RRHH_usuario      RRHH_usuario[]
+
+  @@schema("RRHH")
+}
+
+model RRHH_rol {
+  id_rol        Int             @id @default(autoincrement())
+  name_rol      String?         @db.VarChar(100)
+  RRHH_empleado RRHH_empleado[]
+
+  @@schema("RRHH")
+}
+
+model RRHH_solicitud {
+  id_solicitud   Int            @id @default(autoincrement())
+  id_empleado    Int?
+  tipo_solicitud String?        @db.VarChar(100)
+  fecha_inicio   DateTime?      @db.Date
+  fecha_fin      DateTime?      @db.Date
+  estado         String?        @db.VarChar(50)
+  RRHH_empleado  RRHH_empleado? @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_solicitud_empleado")
+
+  @@schema("RRHH")
+}
+
+model RRHH_usuario {
+  id_usuario    Int            @id @default(autoincrement())
+  username      String?        @db.VarChar(50)
+  password      String?        @db.VarChar(255)
+  id_empleado   Int?
+  RRHH_empleado RRHH_empleado? @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_empleado")
+
+  @@schema("RRHH")
+}
+
+model cliente {
+  id_cliente Int     @id @default(autoincrement())
+  rut        String? @db.VarChar(20)
+  nombre     String  @db.VarChar(200)
+  correo     String? @db.VarChar(150)
+  telefono   String? @db.VarChar(50)
+  direccion  String? @db.VarChar(255)
+
+  @@schema("Maestros")
+}
+
+model producto {
+  id_producto     String   @id @db.Uuid
+  sku             String?  @db.VarChar(100)
+  nombre          String   @db.VarChar(200)
+  descripcion     String?
+  precio_unitario Decimal? @db.Decimal(12, 2)
+
+  @@schema("Maestros")
+}
+
+model proveedor {
+  id_proveedor String  @id @db.Uuid
+  nombre       String  @db.VarChar(200)
+  contacto     String? @db.VarChar(150)
+  correo       String? @db.VarChar(150)
+
+  @@schema("Maestros")
+}

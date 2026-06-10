@@ -1,21 +1,31 @@
-import axios from 'axios';
-
 export class ComprasClient {
-  private client;
-
   constructor(baseUrl?: string) {
-    const base = baseUrl || process.env.COMPRAS_API_URL || 'http://localhost:4000';
-    this.client = axios.create({ baseURL: base, timeout: 5000 });
+    this.baseUrl = baseUrl || process.env.COMPRAS_API_URL || 'http://localhost:4000';
   }
 
+  private readonly baseUrl: string;
+
   async getSendedOrders() {
-    const res = await this.client.get('/api/buy-order/sended');
-    return res.data;
+    const res = await fetch(`${this.baseUrl}/api/buy-order/sended`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (!res.ok) {
+      throw new Error(`Compras GET sended failed: ${res.status}`);
+    }
+    return res.json();
   }
 
   async updateOrder(id: string, payload: any) {
-    const res = await this.client.patch(`/api/buy-order/${id}`, payload);
-    return res.data;
+    const res = await fetch(`${this.baseUrl}/api/buy-order/${id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    if (!res.ok) {
+      throw new Error(`Compras PATCH order failed: ${res.status}`);
+    }
+    return res.json();
   }
 }
 

@@ -6,11 +6,23 @@ import { RolController } from './presentation/rol.controller';
 import { RolService } from './application/rol.service';
 import { SolicitudController } from './presentation/solicitud.controller';
 import { SolicitudService } from './application/solicitud.service';
+import { AuthController } from './presentation/auth.controller';
+import { AuthService } from './application/auth.service';
 
 @Module({
   imports: [PrismaModule],
-  controllers: [EmpleadoController, RolController, SolicitudController],
-  providers: [EmpleadoService, RolService, SolicitudService],
-  exports: [],
+  controllers: [
+    EmpleadoController,
+    RolController,
+    SolicitudController,
+    AuthController,
+  ],
+  providers: [
+    EmpleadoService,
+    RolService,
+    SolicitudService,
+    AuthService,
+  ],
+  exports: [AuthService],
 })
 export class RrhhModule {}

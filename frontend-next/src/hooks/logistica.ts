@@ -1,6 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '../api/axios';
 
+function asArray<T>(data: unknown): T[] {
+  return Array.isArray(data) ? data : [];
+}
+
 export interface CrearTransportistaPayload {
   nombre_transp: string;
   patente_vehiculo: string;
@@ -28,7 +32,7 @@ export function useTransportistas() {
     queryKey: ['logistica', 'transportistas'],
     queryFn: async () => {
       const { data } = await api.get('/logistica/transportistas');
-      return data;
+      return asArray(data);
     },
   });
 }
@@ -51,7 +55,7 @@ export function useDirecciones() {
     queryKey: ['logistica', 'direcciones'],
     queryFn: async () => {
       const { data } = await api.get('/logistica/direcciones');
-      return data;
+      return asArray(data);
     },
   });
 }
@@ -74,7 +78,7 @@ export function usePickings() {
     queryKey: ['logistica', 'pickings'],
     queryFn: async () => {
       const { data } = await api.get('/logistica/pickings');
-      return data;
+      return asArray(data);
     },
   });
 }
@@ -123,7 +127,7 @@ export function useGuias() {
     queryKey: ['logistica', 'guias'],
     queryFn: async () => {
       const { data } = await api.get('/logistica/guias');
-      return data;
+      return asArray(data);
     },
   });
 }
@@ -137,6 +141,46 @@ export function useCrearGuia() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['logistica', 'guias'] });
+    },
+  });
+}
+
+export function useEmpleados() {
+  return useQuery({
+    queryKey: ['rrhh', 'empleados'],
+    queryFn: async () => {
+      const { data } = await api.get('/rrhh/empleados');
+      return asArray(data);
+    },
+  });
+}
+
+export function useMaestroClientes() {
+  return useQuery({
+    queryKey: ['logistica', 'maestros', 'clientes'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/maestros/clientes');
+      return asArray(data);
+    },
+  });
+}
+
+export function useMaestroProductos() {
+  return useQuery({
+    queryKey: ['logistica', 'maestros', 'productos'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/maestros/productos');
+      return data as { catalogo: any[]; inventario: any[] };
+    },
+  });
+}
+
+export function useMaestroProveedores() {
+  return useQuery({
+    queryKey: ['logistica', 'maestros', 'proveedores'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/maestros/proveedores');
+      return asArray(data);
     },
   });
 }
