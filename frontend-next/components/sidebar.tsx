@@ -14,7 +14,10 @@ import {
   ChevronDown,
   ClipboardList,
   MapPin,
+  LogOut,
 } from "lucide-react"
+import { useAuth } from "@/src/context/AuthContext"
+import { useRouter } from "next/navigation"
 
 interface NavItem {
   title: string
@@ -165,6 +168,32 @@ function SidebarNav() {
 }
 
 export function Sidebar() {
+  const { token, tipoUser, setToken, setUsertipo } = useAuth()
+  const router = useRouter()
+
+  const username = useMemo(() => {
+    if (!token) return "Usuario"
+    try {
+      const base64Url = token.split(".")[1]
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+      const jsonPayload = decodeURIComponent(
+        window.atob(base64)
+          .split("")
+          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      )
+      return JSON.parse(jsonPayload).username || "Usuario"
+    } catch {
+      return "Usuario"
+    }
+  }, [token])
+
+  const handleLogout = () => {
+    setToken(null)
+    setUsertipo(null)
+    router.push("/login")
+  }
+
   return (
     <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-sidebar-border bg-sidebar">
       <div className="flex h-full flex-col">
@@ -183,15 +212,21 @@ export function Sidebar() {
         </Suspense>
 
         <div className="border-t border-sidebar-border p-4">
-          <div className="flex items-center gap-3 rounded-md px-3 py-2">
+          <div className="flex items-center gap-3 rounded-md px-3 py-2 bg-sidebar-accent/30">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent">
               <Users className="h-4 w-4 text-sidebar-accent-foreground" />
             </div>
             <div className="flex-1 truncate">
-              <p className="text-sm font-medium text-sidebar-foreground">ACA IRIA EL USER</p>
-              <p className="text-xs text-sidebar-foreground/60">ACA IRIA EL CORREO</p>
+              <p className="text-sm font-medium text-sidebar-foreground">{username}</p>
+              <p className="text-xs text-sidebar-foreground/60">{tipoUser || "Invitado"}</p>
             </div>
-            <Settings className="h-4 w-4 text-sidebar-foreground/60" />
+            <button
+              onClick={handleLogout}
+              className="p-1.5 rounded-md hover:bg-sidebar-accent text-sidebar-foreground/60 hover:text-destructive transition-colors"
+              title="Cerrar sesión"
+            >
+              <LogOut className="h-4.5 w-4.5" />
+            </button>
           </div>
         </div>
       </div>

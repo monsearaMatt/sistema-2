@@ -9,19 +9,11 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   try {
-    console.log("=== PRODUCTS ===");
-    const products = await prisma.producto.findMany();
-    console.log(JSON.stringify(products, null, 2));
-
-    console.log("=== PICKING #4 and #5 ===");
-    const pickings = await prisma.log_picking.findMany({
-      where: { id_ot: { in: [4, 5] } }
+    console.log("=== ORDENES DE COMPRA ===");
+    const orders = await prisma.ordenCompra.findMany({
+      include: { Detalle_OC: true }
     });
-    console.log(JSON.stringify(pickings, null, 2));
-
-    console.log("=== CLIENTS ===");
-    const clients = await prisma.clientes.findMany();
-    console.log(JSON.stringify(clients, null, 2));
+    console.log(JSON.stringify(orders, null, 2));
   } catch (err) {
     console.error("QUERY ERROR:", err);
   } finally {

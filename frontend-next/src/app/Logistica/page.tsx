@@ -23,6 +23,7 @@ import {
   Save,
   X,
   BarChart3,
+  Network,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,8 @@ import {
   useMaestroProductos,
   useVentasPedidos,
   useComprasOrdenes,
+  useComprasSendedOrders,
+  useActualizarCompraEstado,
   useRecepciones,
   useCrearRecepcion,
   useConfirmarRecepcion,
@@ -198,6 +201,7 @@ function LogisticaPageContent() {
   const queryMaestroClientes = useMaestroClientes();
   const queryVentasPedidos = useVentasPedidos();
   const queryComprasOrdenes = useComprasOrdenes();
+  const queryComprasSended = useComprasSendedOrders();
   const queryRecepciones = useRecepciones();
   const queryMovimientos = useMovimientosInventario();
   const queryProductos = useMaestroProductos();
@@ -220,6 +224,7 @@ function LogisticaPageContent() {
   const crearRecepcion = useCrearRecepcion();
   const confirmarRecepcion = useConfirmarRecepcion();
   const confirmarDespacho = useConfirmarDespacho();
+  const actualizarCompraEstado = useActualizarCompraEstado();
 
   // Local forms state
   const [transportistaForm, setTransportistaForm] = useState({ nombre_transp: "", patente_vehiculo: "", id_empleado: "" });
@@ -250,6 +255,7 @@ function LogisticaPageContent() {
     queryMaestroClientes.isLoading ||
     queryVentasPedidos.isLoading ||
     queryComprasOrdenes.isLoading ||
+    queryComprasSended.isLoading ||
     queryRecepciones.isLoading ||
     queryMovimientos.isLoading ||
     queryProductos.isLoading ||
@@ -264,6 +270,7 @@ function LogisticaPageContent() {
   const maestroClientes = (queryMaestroClientes.data ?? []) as { id_cliente: number; nombre: string; rut?: string }[];
   const ventasPedidos = (queryVentasPedidos.data ?? []) as VentasPedidoApi[];
   const comprasOrdenes = (queryComprasOrdenes.data ?? []) as ComprasOrdenApi[];
+  const comprasSended = (queryComprasSended.data ?? []) as any[];
   const recepciones = (queryRecepciones.data ?? []) as RecepcionApi[];
   const movimientos = (queryMovimientos.data ?? []) as MovimientoApi[];
   const productosList = (queryProductos.data?.inventario ?? []) as any[];
@@ -404,7 +411,7 @@ function LogisticaPageContent() {
 
         {/* Tabs navigation */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-5 lg:w-max mb-6">
+          <TabsList className="grid w-full grid-cols-6 lg:w-max mb-6">
             <TabsTrigger value="despacho" className="gap-2">
               <ShoppingBag className="h-4 w-4" /> Despacho
             </TabsTrigger>
@@ -419,6 +426,9 @@ function LogisticaPageContent() {
             </TabsTrigger>
             <TabsTrigger value="maestros" className="gap-2">
               <MapPin className="h-4 w-4" /> Maestros
+            </TabsTrigger>
+            <TabsTrigger value="compras-api" className="gap-2 text-blue-400">
+              <Network className="h-4 w-4" /> Integración API
             </TabsTrigger>
           </TabsList>
 
@@ -745,6 +755,28 @@ function LogisticaPageContent() {
                                 </span>
                               </div>
                             ) : null}
+
+                            {oc.estado !== "ENVIADA" && !oc.ingresada && (
+                              <div className="mt-2 pt-2 border-t border-border/40 flex justify-end">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-7 text-[10px] text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 gap-1"
+                                  disabled={actualizarCompraEstado.isPending}
+                                  onClick={() => {
+                                    actualizarCompraEstado.mutate({
+                                      id: oc.id,
+                                      estado: "ENVIADA"
+                                    }, {
+                                      onSuccess: () => alert(`Orden ${oc.id.substring(0, 8)}... marcada como ENVIADA en el backend externo.`),
+                                      onError: (err) => alert(`Error al actualizar estado: ${mutationError(err)}`)
+                                    });
+                                  }}
+                                >
+                                  <Network className="h-3 w-3" /> Simular Envío (API)
+                                </Button>
+                              </div>
+                            )}
                           </div>
                         );
                       })
@@ -1265,6 +1297,169 @@ function LogisticaPageContent() {
                   ))}
                 </div>
               </Card>
+            </div>
+          </TabsContent>
+
+          {/* TAB 6: INTEGRACIÓN API COMPRAS */}
+          <TabsContent value="compras-api" className="space-y-6 outline-none">
+            <div className="grid gap-6 lg:grid-cols-12">
+              {/* Left Column: API Status & Explanation */}
+              <div className="lg:col-span-4 space-y-4">
+                <Card className="border border-border/50 bg-card/40 backdrop-blur-md p-6">
+                  <SectionTitle 
+                    icon={Network} 
+                    title="Estado de la Integración" 
+                    subtitle="Monitorización de endpoints HTTP REST con el módulo de Compras." 
+                  />
+                  
+                  <div className="mt-6 space-y-4">
+                    <div className="flex items-center justify-between p-3 rounded-lg bg-secondary/35 border border-border/40">
+                      <span className="text-sm font-medium">Servidor de Compras</span>
+                      {queryComprasSended.isError ? (
+                        <Badge variant="destructive" className="gap-1 animate-pulse">
+                          <AlertCircle className="h-3 w-3" /> Desconectado
+                        </Badge>
+                      ) : (
+                        <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 gap-1">
+                          <CheckCircle className="h-3 w-3" /> Conectado (Port 4000)
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-secondary/20 border border-border/30 space-y-3">
+                      <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Flujo de Integración</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Este módulo consume datos transaccionales de compras a través de peticiones HTTP en tiempo real. 
+                        No lee de la base de datos local de Logística, sirviendo como evidencia de conexión cruzada entre servicios.
+                      </p>
+                      <div className="text-[10px] font-mono bg-black/30 p-2 rounded text-blue-300 overflow-x-auto space-y-1">
+                        <div>GET /logistica/compras/sended</div>
+                        <div className="text-muted-foreground">↳ Proxy hacia:</div>
+                        <div className="text-emerald-400 font-bold">GET http://localhost:4000/api/buy-order/sended</div>
+                      </div>
+                    </div>
+
+                    <div className="p-4 rounded-lg bg-blue-500/5 border border-blue-500/10 space-y-2">
+                      <h4 className="text-xs font-semibold text-blue-400">¿Cómo verificar la conexión?</h4>
+                      <ul className="text-xs text-muted-foreground list-disc pl-4 space-y-1">
+                        <li><strong>Evidencia 1 (Desconectado):</strong> Apaga el backend de Compras y actualiza la pestaña. Verás el indicador en rojo y un fallo de red.</li>
+                        <li><strong>Evidencia 2 (Conectado):</strong> Levanta el backend de Compras en el puerto 4000 y refresca. Se pondrá en verde y listará las órdenes.</li>
+                        <li><strong>Evidencia 3 (Trazabilidad):</strong> Usa el botón "Simular Envío" en la pestaña de Recepción para cambiar el estado a <code className="text-xs font-mono text-emerald-300 bg-emerald-500/10 px-1 rounded">ENVIADA</code>.</li>
+                      </ul>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        className="w-full gap-2 text-xs"
+                        disabled={queryComprasSended.isRefetching}
+                        onClick={() => {
+                          queryComprasSended.refetch();
+                        }}
+                      >
+                        <RefreshCw className={`h-3.5 w-3.5 ${queryComprasSended.isRefetching ? "animate-spin" : ""}`} />
+                        Refrescar Conexión
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </div>
+
+              {/* Right Column: Sended Orders List */}
+              <div className="lg:col-span-8 space-y-4">
+                <Card className="p-6">
+                  <div className="flex items-center justify-between">
+                    <SectionTitle 
+                      icon={FileText} 
+                      title="Órdenes de Compra en Tránsito (API)" 
+                      subtitle="Órdenes con estado ENVIADA recuperadas dinámicamente desde el backend de Compras." 
+                    />
+                    <Badge className="bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                      {comprasSended.length} orden(es)
+                    </Badge>
+                  </div>
+
+                  <div className="mt-6 space-y-4">
+                    {queryComprasSended.isError ? (
+                      <div className="flex flex-col items-center justify-center p-12 text-center border border-dashed border-destructive/20 rounded-xl bg-destructive/5">
+                        <AlertCircle className="h-10 w-10 text-destructive mb-3 animate-pulse" />
+                        <h3 className="font-semibold text-destructive">Error al conectar con la API de Compras</h3>
+                        <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                          No se pudo establecer conexión con el backend de compras en <code className="text-[10px] bg-black/40 px-1 py-0.5 rounded font-mono text-red-300">http://localhost:4000</code>.
+                          Asegúrate de que ese servidor esté encendido.
+                        </p>
+                      </div>
+                    ) : comprasSended.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center p-12 text-center border border-dashed border-border rounded-xl bg-secondary/5">
+                        <Inbox className="h-10 w-10 text-muted-foreground/50 mb-3" />
+                        <h3 className="font-medium">No hay órdenes en estado ENVIADA</h3>
+                        <p className="text-xs text-muted-foreground mt-1 max-w-sm">
+                          La conexión con el backend externo es exitosa, pero actualmente no existen órdenes de compra con estado <code className="text-xs font-mono text-emerald-400">ENVIADA</code> en su base de datos.
+                        </p>
+                        <div className="mt-4 p-4 bg-secondary/20 rounded-lg text-left border border-border/30 max-w-md">
+                          <p className="text-xs text-muted-foreground font-semibold text-center sm:text-left">Simular Envío de Orden:</p>
+                          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                            Puedes forzar una orden al estado <code className="text-xs font-mono">ENVIADA</code> haciendo clic en el botón "Simular Envío" de cualquiera de las órdenes pendientes en la pestaña de <strong>Recepción</strong>.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {comprasSended.map((oc) => (
+                          <div 
+                            key={oc.id} 
+                            className="p-5 rounded-xl border border-border/50 bg-secondary/15 hover:bg-secondary/25 transition-all duration-200 space-y-4"
+                          >
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                              <div>
+                                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">ID de Orden (UUID)</span>
+                                <h3 className="text-sm font-mono font-bold text-primary">{oc.id}</h3>
+                              </div>
+                              <div className="flex gap-2">
+                                <Badge className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                                  {oc.estado}
+                                </Badge>
+                                <Badge variant="outline" className="text-xs">
+                                  Total: ${Number(oc.total).toLocaleString()}
+                                </Badge>
+                              </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4 text-xs p-3 rounded-lg bg-secondary/25 border border-border/20">
+                              <div>
+                                <span className="text-muted-foreground block font-medium">Proveedor</span>
+                                <span className="font-semibold">{oc.proveedor || "No especificado"}</span>
+                              </div>
+                              <div>
+                                <span className="text-muted-foreground block font-medium">Fecha Emisión (Compras)</span>
+                                <span className="font-semibold">{new Date(oc.fecha_creacion).toLocaleString()}</span>
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Productos de la Orden</h4>
+                              <div className="divide-y divide-border/20 border border-border/20 rounded-lg overflow-hidden bg-background/50">
+                                {oc.detalles?.map((det: any, idx: number) => (
+                                  <div key={det.id_producto || idx} className="flex justify-between items-center p-2.5 text-xs">
+                                    <div className="space-y-0.5">
+                                      <span className="font-semibold">{det.nombre_producto}</span>
+                                      <span className="block text-[10px] text-muted-foreground font-mono">{det.id_producto}</span>
+                                    </div>
+                                    <div className="text-right">
+                                      <span className="font-semibold block">{det.cantidad} unidad(es)</span>
+                                      <span className="text-[10px] text-muted-foreground">${Number(det.precio_unitario).toLocaleString()} c/u</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Card>
+              </div>
             </div>
           </TabsContent>
         </Tabs>

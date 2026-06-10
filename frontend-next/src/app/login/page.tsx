@@ -28,12 +28,7 @@ export default function LoginPage() {
             if (redirectUrl) {
                 router.push(redirectUrl);
             } else {
-                const tipo = data.user.tipo;
-                if (["Jefe de Logística", "Operador de Bodega", "Admin Sistema"].includes(tipo)) {
-                    router.push("/Logistica");
-                } else {
-                    router.push("/RRHH");
-                }
+                router.push("/");
             }
         },
         (_error) => {

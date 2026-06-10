@@ -39,7 +39,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (token && esPublica) {
+  if (token && esPublica && pathname !== "/") {
     return redirectByRole(tipo, request);
   }
 

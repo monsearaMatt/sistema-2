@@ -303,6 +303,16 @@ export function useComprasOrdenes() {
   });
 }
 
+export function useComprasSendedOrders() {
+  return useQuery({
+    queryKey: ['logistica', 'compras', 'sended'],
+    queryFn: async () => {
+      const { data } = await api.get('/logistica/compras/sended');
+      return asArray(data);
+    },
+  });
+}
+
 export function useRecepciones() {
   return useQuery({
     queryKey: ['logistica', 'recepciones'],
@@ -338,6 +348,20 @@ export function useConfirmarRecepcion() {
       queryClient.invalidateQueries({ queryKey: ['logistica', 'compras', 'ordenes'] });
       queryClient.invalidateQueries({ queryKey: ['logistica', 'maestros', 'productos'] });
       queryClient.invalidateQueries({ queryKey: ['logistica', 'inventario', 'movimientos'] });
+    },
+  });
+}
+
+export function useActualizarCompraEstado() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ id, estado }: { id: string; estado: string }) => {
+      const { data } = await api.patch(`/logistica/compras/${id}`, { estado });
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'compras', 'sended'] });
+      queryClient.invalidateQueries({ queryKey: ['logistica', 'compras', 'ordenes'] });
     },
   });
 }

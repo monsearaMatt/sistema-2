@@ -1,3 +1,5 @@
+import api from "../src/api/axios"
+
 export type PurchaseOrderStatus = "Pendiente" | "Aprobada" | "Cancelada"
 
 export interface PurchaseOrderItem {
@@ -203,51 +205,67 @@ function createOrderId() {
 }
 
 export async function getPurchaseOrders(): Promise<PurchaseOrder[]> {
-  return resolveAfterDelay(mockPurchaseOrders.map(clonePurchaseOrder))
+  const { data } = await api.get('/logistica/compras/ordenes')
+  return data.map((oc: any) => ({
+    id: oc.id,
+    supplierId: oc.id_proveedor,
+    supplierName: oc.Proveedor?.nombre || 'Proveedor Desconocido',
+    createdAt: oc.fecha_creacion ? oc.fecha_creacion.split('T')[0] : '',
+    status: oc.estado === 'PENDIENTE' || oc.estado === 'PENDIENTE' ? 'Pendiente' : oc.estado === 'APROBADA' || oc.estado === 'Aprobada' ? 'Aprobada' : 'Cancelada',
+    total: oc.total,
+    userId: oc.id_usuario,
+    userName: oc.id_usuario,
+    items: (oc.Detalle_OC || []).map((det: any) => ({
+      id: det.id_detalle,
+      productName: det.nombre_producto,
+      quantity: det.cantidad,
+      unitPrice: det.precio_unitario,
+      subtotal: det.cantidad * det.precio_unitario,
+    }))
+  }))
 }
 
 export async function getPurchaseOrderSuppliers(): Promise<
   PurchaseOrderSupplier[]
 > {
-  return resolveAfterDelay(mockSuppliers.map((supplier) => ({ ...supplier })))
+  const { data } = await api.get('/logistica/maestros/proveedores')
+  return data.map((prov: any) => ({
+    id: prov.id,
+    name: prov.nombre,
+    rut: prov.rutEmpresa || prov.rut || '',
+    active: true,
+  }))
 }
 
 export async function createPurchaseOrder(
   input: CreatePurchaseOrderInput,
 ): Promise<PurchaseOrder> {
-  const supplier = mockSuppliers.find((item) => item.id === input.supplierId)
-  const user = mockUsers.find((item) => item.id === input.userId)
-
-  if (!supplier) {
-    throw new Error("Proveedor no encontrado")
-  }
-
-  const items = input.items.map((item, index) => {
-    const quantity = Number(item.quantity)
-    const unitPrice = Number(item.unitPrice)
-
-    return {
-      id: `OCI-${Date.now()}-${index + 1}`,
+  const { data: oc } = await api.post('/logistica/compras', {
+    supplierId: input.supplierId,
+    createdAt: input.createdAt,
+    userId: input.userId,
+    items: input.items.map((item) => ({
       productName: item.productName,
-      quantity,
-      unitPrice,
-      subtotal: quantity * unitPrice,
-    }
+      quantity: item.quantity,
+      unitPrice: item.unitPrice,
+    })),
   })
 
-  const purchaseOrder: PurchaseOrder = {
-    id: createOrderId(),
-    supplierId: supplier.id,
-    supplierName: supplier.name,
-    createdAt: input.createdAt,
-    status: "Pendiente",
-    total: items.reduce((acc, item) => acc + item.subtotal, 0),
-    userId: input.userId,
-    userName: user?.name ?? "Usuario sin asignar",
-    items,
+  return {
+    id: oc.id,
+    supplierId: oc.id_proveedor,
+    supplierName: oc.Proveedor?.nombre || 'Proveedor',
+    createdAt: oc.fecha_creacion ? oc.fecha_creacion.split('T')[0] : '',
+    status: oc.estado === 'PENDIENTE' || oc.estado === 'PENDIENTE' ? 'Pendiente' : oc.estado === 'APROBADA' || oc.estado === 'Aprobada' ? 'Aprobada' : 'Cancelada',
+    total: oc.total,
+    userId: oc.id_usuario,
+    userName: oc.id_usuario,
+    items: (oc.Detalle_OC || []).map((det: any) => ({
+      id: det.id_detalle,
+      productName: det.nombre_producto,
+      quantity: det.cantidad,
+      unitPrice: det.precio_unitario,
+      subtotal: det.cantidad * det.precio_unitario,
+    }))
   }
-
-  mockPurchaseOrders = [purchaseOrder, ...mockPurchaseOrders]
-
-  return resolveAfterDelay(clonePurchaseOrder(purchaseOrder), 500)
 }

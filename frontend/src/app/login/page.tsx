@@ -20,11 +20,13 @@ export default function LoginPage() {
         async (data) => {
             setToken(data.access_token);
             setUsertipo(data.user.tipo);
-            const tipo = data.user.tipo;
-            if (["Jefe de Logística", "Operador de Bodega"].includes(tipo)) {
-            router.push("/Logistica");
+            
+            const searchParams = new URLSearchParams(window.location.search);
+            const redirectUrl = searchParams.get("redirect");
+            if (redirectUrl) {
+                router.push(redirectUrl);
             } else {
-            router.push("/RRHH");
+                router.push("/");
             }
         },
         (_error) => {
