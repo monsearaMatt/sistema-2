@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { usePathname } from "next/navigation"
-import { useState } from "react"
+import { usePathname, useSearchParams } from "next/navigation"
+import { useState, useMemo, Suspense } from "react"
 import { cn } from "@/lib/utils"
 import {
   ShoppingCart,
@@ -48,24 +48,46 @@ const navigation: { section: string; items: NavItem[] }[] = [
   {
     section: "LOGISTICA",
     items: [
-      { title: "Panel", icon: LayoutDashboard, href: "/Logistica" },
-      { title: "Pickings", icon: ClipboardList, href: "/Logistica" },
-      { title: "Guías", icon: FileText, href: "/Logistica" },
-      { title: "Transportistas", icon: Truck, href: "/Logistica" },
-      { title: "Direcciones", icon: MapPin, href: "/Logistica" },
+      { title: "Panel", icon: LayoutDashboard, href: "/Logistica?tab=despacho" },
+      { title: "Pickings", icon: ClipboardList, href: "/Logistica?tab=despacho" },
+      { title: "Guías", icon: FileText, href: "/Logistica?tab=despacho" },
+      { title: "Transportistas", icon: Truck, href: "/Logistica?tab=maestros&sub=transportistas" },
+      { title: "Direcciones", icon: MapPin, href: "/Logistica?tab=maestros&sub=direcciones" },
     ],
   },
 ]
 
 function NavItemComponent({ item }: { item: NavItem }) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [isOpen, setIsOpen] = useState(
     item.children?.some((child) => pathname.startsWith(child.href)) ?? false
   )
 
-  const isActive = item.href
-    ? pathname === item.href
-    : item.children?.some((child) => pathname.startsWith(child.href))
+  const activeTab = searchParams ? searchParams.get("tab") || "" : ""
+  const activeSub = searchParams ? searchParams.get("sub") || "" : ""
+
+  const isActive = useMemo(() => {
+    if (!item.href) {
+      return item.children?.some((child) => pathname.startsWith(child.href))
+    }
+
+    if (item.href.includes("?")) {
+      const [itemPath, itemQuery] = item.href.split("?")
+      if (pathname !== itemPath) return false
+
+      const itemParams = new URLSearchParams(itemQuery)
+      for (const [key, value] of itemParams.entries()) {
+        if (searchParams.get(key) !== value) {
+          return false
+        }
+      }
+      return true
+    }
+
+    if (pathname !== item.href) return false
+    return !activeTab
+  }, [pathname, searchParams, item.href, item.children, activeTab])
 
   if (item.children) {
     return (
@@ -112,7 +134,7 @@ function NavItemComponent({ item }: { item: NavItem }) {
       href={item.href!}
       className={cn(
         "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-        pathname === item.href
+        isActive
           ? "bg-sidebar-primary text-sidebar-primary-foreground"
           : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
       )}
@@ -120,6 +142,25 @@ function NavItemComponent({ item }: { item: NavItem }) {
       <item.icon className="h-4 w-4" />
       {item.title}
     </Link>
+  )
+}
+
+function SidebarNav() {
+  return (
+    <nav className="flex-1 space-y-6 overflow-y-auto p-4">
+      {navigation.map((group) => (
+        <div key={group.section}>
+          <h2 className="mb-2 px-3 text-xs font-semibold tracking-wider text-sidebar-foreground/50">
+            {group.section}
+          </h2>
+          <div className="space-y-1">
+            {group.items.map((item) => (
+              <NavItemComponent key={item.title} item={item} />
+            ))}
+          </div>
+        </div>
+      ))}
+    </nav>
   )
 }
 
@@ -137,20 +178,9 @@ export function Sidebar() {
           </div>
         </div>
 
-        <nav className="flex-1 space-y-6 overflow-y-auto p-4">
-          {navigation.map((group) => (
-            <div key={group.section}>
-              <h2 className="mb-2 px-3 text-xs font-semibold tracking-wider text-sidebar-foreground/50">
-                {group.section}
-              </h2>
-              <div className="space-y-1">
-                {group.items.map((item) => (
-                  <NavItemComponent key={item.title} item={item} />
-                ))}
-              </div>
-            </div>
-          ))}
-        </nav>
+        <Suspense fallback={<div className="flex-1 p-4 text-xs text-muted-foreground">Cargando...</div>}>
+          <SidebarNav />
+        </Suspense>
 
         <div className="border-t border-sidebar-border p-4">
           <div className="flex items-center gap-3 rounded-md px-3 py-2">

@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import type { ElementType, ReactNode } from "react";
 import {
   AlertCircle,
@@ -67,8 +68,8 @@ function SectionTitle({ icon: Icon, title, subtitle }: { icon: ElementType; titl
   );
 }
 
-function Card({ children, className = "" }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-xl border border-border bg-card p-5 shadow-xs hover:shadow-md transition-all ${className}`}>{children}</div>;
+function Card({ children, className = "", id }: { children: ReactNode; className?: string; id?: string }) {
+  return <div id={id} className={`rounded-xl border border-border bg-card p-5 shadow-xs hover:shadow-md transition-all ${className}`}>{children}</div>;
 }
 
 function Stat({ label, value, icon: Icon }: { label: string; value: number | string; icon?: ElementType }) {
@@ -162,8 +163,29 @@ interface MovimientoApi {
   inv_producto?: { nombre?: string; codigo?: string };
 }
 
-export default function LogisticaPage() {
-  const [activeTab, setActiveTab] = useState("despacho");
+function LogisticaPageContent() {
+  const searchParams = useSearchParams();
+  const tabParam = searchParams.get("tab") || "despacho";
+  const subParam = searchParams.get("sub") || "";
+  const [activeTab, setActiveTab] = useState(tabParam);
+
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
+
+  useEffect(() => {
+    if (subParam && activeTab === tabParam) {
+      const timer = setTimeout(() => {
+        const element = document.getElementById(subParam);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [subParam, activeTab, tabParam]);
 
   // Queries
   const queryTransportistas = useTransportistas();
@@ -447,7 +469,10 @@ export default function LogisticaPage() {
                                   onClick={() =>
                                     crearPicking.mutate(
                                       { id_pedido_venta: p.id_pedido, estado: "Pendiente" },
-                                      { onSuccess: () => alert(`Picking generado con éxito para el Pedido #${p.id_pedido}`) }
+                                      { 
+                                        onSuccess: () => alert(`Picking generado con éxito para el Pedido #${p.id_pedido}`),
+                                        onError: (error) => alert(`Error al generar picking: ${mutationError(error)}`)
+                                      }
                                     )
                                   }
                                 >
@@ -469,7 +494,7 @@ export default function LogisticaPage() {
 
               {/* Right Column: Pickings & OTs */}
               <div className="lg:col-span-6 space-y-6">
-                <Card>
+                <Card id="pickings">
                   <SectionTitle icon={ClipboardList} title="Pickings y Órdenes de Trabajo (OT)" subtitle="Asigna operarios, emite guías y descuenta stock." />
                   <div className="mt-3">
                     <Input
@@ -514,7 +539,9 @@ export default function LogisticaPage() {
                                   onChange={(e) => {
                                     const val = e.target.value;
                                     if (val) {
-                                      asignarPicking.mutate({ id: otId, id_empleado: Number(val) });
+                                      asignarPicking.mutate({ id: otId, id_empleado: Number(val) }, {
+                                        onError: (error) => alert(`Error al asignar operario: ${mutationError(error)}`)
+                                      });
                                     }
                                   }}
                                 >
@@ -565,7 +592,8 @@ export default function LogisticaPage() {
                                         id_transportista: Number(guiaFormForOt[otId]?.id_transportista),
                                         id_direccion: Number(guiaFormForOt[otId]?.id_direccion)
                                       }, {
-                                        onSuccess: () => alert("Guía de despacho emitida correctamente.")
+                                        onSuccess: () => alert("Guía de despacho emitida correctamente."),
+                                        onError: (error) => alert(`Error al emitir guía: ${mutationError(error)}`)
                                       });
                                     }}
                                   >
@@ -593,7 +621,8 @@ export default function LogisticaPage() {
                                   disabled={!item.id_empleado || !hasGuia || confirmarDespacho.isPending}
                                   onClick={() => {
                                     confirmarDespacho.mutate(otId, {
-                                      onSuccess: () => alert("Egreso de stock confirmado. Se registró movimiento SALIDA en inventario.")
+                                      onSuccess: () => alert("Egreso de stock confirmado. Se registró movimiento SALIDA en inventario."),
+                                      onError: (error) => alert(`Error al confirmar egreso: ${mutationError(error)}`)
                                     });
                                   }}
                                 >
@@ -689,7 +718,8 @@ export default function LogisticaPage() {
                                         id_orden_compra: oc.id,
                                         id_empleado: Number(recepcionFormForOc[oc.id])
                                       }, {
-                                        onSuccess: () => alert("Recepción registrada físicamente en bodega. Ahora confirma el ingreso a inventario.")
+                                        onSuccess: () => alert("Recepción registrada físicamente en bodega. Ahora confirma el ingreso a inventario."),
+                                        onError: (error) => alert(`Error al registrar recepción: ${mutationError(error)}`)
                                       });
                                     }}
                                   >
@@ -758,7 +788,8 @@ export default function LogisticaPage() {
                                 disabled={confirmarRecepcion.isPending}
                                 onClick={() => {
                                   confirmarRecepcion.mutate(r.id_recepcion, {
-                                    onSuccess: () => alert("Ingreso confirmado. El stock fue cargado a Inventario y se generó el movimiento de ENTRADA.")
+                                    onSuccess: () => alert("Ingreso confirmado. El stock fue cargado a Inventario y se generó el movimiento de ENTRADA."),
+                                    onError: (error) => alert(`Error al confirmar ingreso: ${mutationError(error)}`)
                                   });
                                 }}
                               >
@@ -933,7 +964,7 @@ export default function LogisticaPage() {
           <TabsContent value="maestros" className="space-y-6 outline-none">
             <div className="grid gap-6 lg:grid-cols-2">
               {/* Transportistas CRUD */}
-              <Card>
+              <Card id="transportistas">
                 <SectionTitle icon={Truck} title="Gestión de Transportistas" subtitle="CRUD de transportistas autorizados para guías." />
                 
                 {/* Form Context: Create or Update */}
@@ -1087,7 +1118,7 @@ export default function LogisticaPage() {
               </Card>
 
               {/* Direcciones CRUD */}
-              <Card>
+              <Card id="direcciones">
                 <SectionTitle icon={MapPin} title="Direcciones de Despacho" subtitle="CRUD de direcciones de entrega de clientes." />
                 
                 {/* Form Context: Create or Update */}
@@ -1229,5 +1260,17 @@ export default function LogisticaPage() {
         </Tabs>
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function LogisticaPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-screen items-center justify-center bg-background text-sm text-muted-foreground">
+        Cargando módulo de logística...
+      </div>
+    }>
+      <LogisticaPageContent />
+    </Suspense>
   );
 }
