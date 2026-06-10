@@ -10,21 +10,18 @@ interface AuthGuardResult {
 }
 
 export function useAuthGuard(rolesPermitidos: string[]): AuthGuardResult {
-  const { token, tipoUser, loading } = useAuth(); // ← tipoUser, igual que en TipoAutenticacion
+  const { token, tipoUser, loading } = useAuth();
   const router = useRouter();
   const [listo, setListo] = useState(false);
 
   useEffect(() => {
-    // Esperar a que el contexto termine de leer las cookies
     if (loading) return;
 
-    // Sin token → login
     if (!token) {
       router.push("/login");
       return;
     }
 
-    // Rol no permitido → redirigir al módulo correcto
     if (tipoUser && !rolesPermitidos.includes(tipoUser)) {
       const ROLES_LOG = ["Jefe de Logística", "Operador de Bodega", "Admin Sistema"];
       router.push(ROLES_LOG.includes(tipoUser) ? "/Logistica" : "/RRHH");
@@ -32,7 +29,8 @@ export function useAuthGuard(rolesPermitidos: string[]): AuthGuardResult {
     }
 
     if (token && tipoUser) setListo(true);
-  }, [token, tipoUser, loading, router]);
+
+  }, [token, tipoUser, loading]);
 
   return { listo, tipoUser: tipoUser ?? null };
 }
