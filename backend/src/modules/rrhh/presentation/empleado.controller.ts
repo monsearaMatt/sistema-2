@@ -48,4 +48,10 @@ export class EmpleadoController {
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.empleadoService.remove(id);
   }
+
+  @Patch(':id/desactivar')
+  async desactivar(@Param('id', ParseIntPipe) id: number) {
+    await this.empleadoService.remove(id);
+    return { message: 'Empleado desactivado.' };
+  }
 }
