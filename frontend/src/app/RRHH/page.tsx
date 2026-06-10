@@ -36,6 +36,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuthGuard } from "../../hooks/useAuthGuard";
+import { LogOut } from "lucide-react"; 
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
@@ -353,6 +355,7 @@ function ModalDetalleEmpleado({
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function RRHHPage() {
+  const { listo } = useAuthGuard(["Admin RRHH", "Admin Sistema", "Empleado"]);
   const { data: empleados = [], isLoading: loadEmp, isError: errEmp } = useEmpleados();
   const { data: solicitudes = [], isLoading: loadSol }                = useSolicitudes();
   const responder = useResponderSolicitud();
@@ -386,6 +389,14 @@ export default function RRHHPage() {
   }, {} as Record<string, number>);
 
   // ── Estados de carga / error ──────────────────────────────────────────────
+
+  
+  if (!listo) return (
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+      <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <p className="text-muted-foreground text-sm animate-pulse">Verificando acceso...</p>
+    </div>
+  );
 
   if (loadEmp) return (
     <div className="min-h-screen bg-background flex items-center justify-center">

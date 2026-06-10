@@ -35,14 +35,6 @@ export default function Home() {
             <Button asChild variant="outline" className="w-full">
               <Link href="/register">Crear Cuenta</Link>
             </Button>
-
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/RRHH">Módulo RRHH</Link>
-            </Button>
-
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/Logistica">Módulo Logística</Link>
-            </Button>
           </div>
         </div>
       </div>

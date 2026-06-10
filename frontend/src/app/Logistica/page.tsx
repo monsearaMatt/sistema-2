@@ -12,6 +12,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { useAuthGuard } from "../../hooks/useAuthGuard";
 import {
   useOrdenesCompra,
   useRegistrarRecepcion,
@@ -588,6 +589,7 @@ function ModalRegistrarRecepcion({ open, onClose }: { open: boolean; onClose: ()
 // ─── MAIN PAGE ────────────────────────────────────────────────────────────────
 
 export default function LogisticaPage() {
+  const { listo } = useAuthGuard(["Jefe de Logística", "Operador de Bodega", "Admin Sistema"]);
   const { data: ots  = [],          isLoading: loadOts  } = useOTsPicking();
   const { data: guias = [],         isLoading: loadGuias } = useGuiasDespacho();
   const { data: ocs  = [],          isLoading: loadOcs  } = useOrdenesCompra();
@@ -611,6 +613,13 @@ export default function LogisticaPage() {
   const ocsPendientes = ocs.filter(oc => oc.estado === "ENVIADA");
   const otsPend       = ots.filter(o => o.estado === "PENDIENTE").length;
   const otsProc       = ots.filter(o => o.estado === "EN_PROCESO").length;
+
+  if (!listo) return (
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+      <div className="w-10 h-10 border-4 border-primary/30 border-t-primary rounded-full animate-spin" />
+      <p className="text-muted-foreground text-sm animate-pulse">Verificando acceso...</p>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 space-y-6">
