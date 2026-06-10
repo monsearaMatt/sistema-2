@@ -41,6 +41,11 @@ export class PickingController {
     return this.pickingService.complete(id);
   }
 
+  @Post(':id/confirm-dispatch')
+  async confirmDispatch(@Param('id', ParseIntPipe) id: number) {
+    return this.pickingService.confirmDispatch(id);
+  }
+
   @Get()
   async findAll() {
     return this.pickingService.findAll();

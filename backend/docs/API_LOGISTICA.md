@@ -58,7 +58,7 @@ Base URL (variable): `{{baseUrl}}` (ej. `http://localhost:3000`)
 
 Notas importantes
 - Validaciones: el backend aplica `ValidationPipe` global con `whitelist: true` y `forbidNonWhitelisted: true`. Los campos extra o no permitidos generan 400.
-- Autorización: aún no implementada (Sprint 3).
+- Autorización e Integraciones: Implementadas en el Sprint 3 mediante JWT, Guards de Roles y sincronización de base de datos/REST. Consulta detalles en [INTEGRACION.md](file:///c:/Users/monse/OneDrive/Documentos/GitHub/sistema-2/backend/docs/INTEGRACION.md).
 
 Ejemplo rápido (curl)
 

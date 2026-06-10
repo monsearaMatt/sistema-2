@@ -23,10 +23,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <ProveedorAuth>
-      <QueryClientProvider client={queryClient}>
+    <QueryClientProvider client={queryClient}>
+      <ProveedorAuth>
         {children}
-      </QueryClientProvider>
-    </ProveedorAuth>
+      </ProveedorAuth>
+    </QueryClientProvider>
   );
 }

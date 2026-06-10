@@ -25,4 +25,24 @@ export class TransportistaService {
       include: { RRHH_empleado: true },
     });
   }
+
+  async update(id_transportista: number, dto: any) {
+    const data: any = {};
+    if (dto.nombre_transp !== undefined) data.nombre_transp = dto.nombre_transp;
+    if (dto.patente_vehiculo !== undefined) data.patente_vehiculo = dto.patente_vehiculo;
+    if (dto.id_empleado !== undefined) {
+      data.RRHH_empleado = { connect: { id_empleado: dto.id_empleado } };
+    }
+
+    return this.prisma.log_transportista.update({
+      where: { id_transportista },
+      data,
+    });
+  }
+
+  async remove(id_transportista: number) {
+    return this.prisma.log_transportista.delete({
+      where: { id_transportista },
+    });
+  }
 }

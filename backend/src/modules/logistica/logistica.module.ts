@@ -17,6 +17,9 @@ import ComprasClient from './infrastructure/compras.client';
 import { MaestrosController } from './presentation/maestros.controller';
 import { MaestrosService } from './application/maestros.service';
 import { IntegrationController } from './presentation/integration.controller';
+import { VentasController } from './presentation/ventas.controller';
+import { RecepcionController } from './presentation/recepcion.controller';
+import { RecepcionService } from './application/recepcion.service';
 
 @Module({
   imports: [PrismaModule],
@@ -29,6 +32,8 @@ import { IntegrationController } from './presentation/integration.controller';
     ComprasController,
     MaestrosController,
     IntegrationController,
+    VentasController,
+    RecepcionController,
   ],
   providers: [
     DireccionService,
@@ -37,6 +42,7 @@ import { IntegrationController } from './presentation/integration.controller';
     GuiaService,
     KpiService,
     MaestrosService,
+    RecepcionService,
     { provide: 'COMPRAS_CLIENT', useValue: new ComprasClient() },
   ],
   exports: [],

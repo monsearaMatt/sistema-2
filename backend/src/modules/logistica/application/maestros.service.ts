@@ -49,4 +49,14 @@ export class MaestrosService {
   async listProveedores() {
     return this.prisma.maestro_proveedor.findMany({ orderBy: { nombre: 'asc' } });
   }
+
+  async listMovimientos() {
+    return this.prisma.inv_movimiento.findMany({
+      include: {
+        inv_producto: true,
+      },
+      orderBy: { fecha: 'desc' },
+      take: 50,
+    });
+  }
 }

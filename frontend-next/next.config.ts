@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
         source: "/rrhh/:path*",
         destination: `${backendUrl}/rrhh/:path*`,
       },
+      {
+        source: "/auth/:path*",
+        destination: `${backendUrl}/rrhh/auth/:path*`,
+      },
     ];
   },
 };

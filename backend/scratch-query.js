@@ -9,11 +9,21 @@ const prisma = new PrismaClient({ adapter });
 
 async function main() {
   try {
-    console.log("=== ALL INVENTARIO PRODUCTS ===");
-    const productos = await prisma.producto.findMany({});
-    console.log(JSON.stringify(productos, null, 2));
+    console.log("=== PRODUCTS ===");
+    const products = await prisma.producto.findMany();
+    console.log(JSON.stringify(products, null, 2));
+
+    console.log("=== PICKING #4 and #5 ===");
+    const pickings = await prisma.log_picking.findMany({
+      where: { id_ot: { in: [4, 5] } }
+    });
+    console.log(JSON.stringify(pickings, null, 2));
+
+    console.log("=== CLIENTS ===");
+    const clients = await prisma.clientes.findMany();
+    console.log(JSON.stringify(clients, null, 2));
   } catch (err) {
-    console.error(err);
+    console.error("QUERY ERROR:", err);
   } finally {
     await prisma.$disconnect();
     await pool.end();
