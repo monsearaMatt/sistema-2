@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect, Suspense } from "react";
+import { useAuthGuard } from "../../hooks/useAuthGuard";
 import { useSearchParams } from "next/navigation";
 import type { ElementType, ReactNode } from "react";
 import {
