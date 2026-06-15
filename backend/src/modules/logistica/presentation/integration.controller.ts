@@ -1,4 +1,11 @@
-import { Body, Controller, Post, UsePipes, ValidationPipe, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  UsePipes,
+  ValidationPipe,
+  UseGuards,
+} from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { MaestrosService } from '../application/maestros.service';
 import { IsInt, IsOptional, IsUUID } from 'class-validator';
@@ -24,7 +31,10 @@ class CreatePickingFromMaestroDto {
 @Controller('logistica/integrations')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class IntegrationController {
-  constructor(private readonly prisma: PrismaService, private readonly maestros: MaestrosService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly maestros: MaestrosService,
+  ) {}
 
   @Post('create-picking-from-maestro')
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -36,7 +46,9 @@ export class IntegrationController {
 
     // Optional: validate empleado exists
     if (dto.id_empleado) {
-      const emp = await this.prisma.rRHH_empleado.findUnique({ where: { id_empleado: dto.id_empleado } });
+      const emp = await this.prisma.rRHH_empleado.findUnique({
+        where: { id_empleado: dto.id_empleado },
+      });
       if (!emp) throw new Error('Empleado no encontrado');
     }
 

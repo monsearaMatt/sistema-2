@@ -30,7 +30,10 @@ describe('PickingService', () => {
   });
 
   it('create should call prisma.create and return result', async () => {
-    const dto = { id_pedido_venta: 2001, estado: 'Pendiente' } as CrearPickingDto;
+    const dto = {
+      id_pedido_venta: 2001,
+      estado: 'Pendiente',
+    } as CrearPickingDto;
     const expected = { id_ot: 1, ...dto };
     mockPrisma.log_picking.create.mockResolvedValue(expected);
 

@@ -32,7 +32,11 @@ describe('Transportista (e2e)', () => {
   });
 
   it('POST /logistica/transportistas -> 201', async () => {
-    const dto = { nombre_transp: 'Test Transp', patente_vehiculo: 'ZZZZ11', id_empleado: 1 };
+    const dto = {
+      nombre_transp: 'Test Transp',
+      patente_vehiculo: 'ZZZZ11',
+      id_empleado: 1,
+    };
     const created = { id_transportista: 123, ...dto };
     mockPrisma.log_transportista.create.mockResolvedValue(created);
 
@@ -54,6 +58,8 @@ describe('Transportista (e2e)', () => {
       .expect(200);
 
     expect(res.body).toEqual(list);
-    expect(mockPrisma.log_transportista.findMany).toHaveBeenCalledWith({ include: { RRHH_empleado: true } });
+    expect(mockPrisma.log_transportista.findMany).toHaveBeenCalledWith({
+      include: { RRHH_empleado: true },
+    });
   });
 });

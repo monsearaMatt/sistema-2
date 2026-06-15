@@ -10,7 +10,10 @@ export class JwtAuthGuard implements CanActivate {
     const parts = auth.split(' ');
     if (parts.length !== 2 || parts[0] !== 'Bearer') return false;
     try {
-      const payload = verifyToken(parts[1], process.env.JWT_SECRET || 'changeme');
+      const payload = verifyToken(
+        parts[1],
+        process.env.JWT_SECRET || 'sistema-2-secret-key',
+      );
       req.user = payload;
       return true;
     } catch (e) {

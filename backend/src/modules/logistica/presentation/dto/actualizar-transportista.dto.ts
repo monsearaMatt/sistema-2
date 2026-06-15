@@ -1,4 +1,10 @@
-import { IsString, IsOptional, IsInt, Length, IsPositive } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsInt,
+  Length,
+  IsPositive,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class ActualizarTransportistaDto {

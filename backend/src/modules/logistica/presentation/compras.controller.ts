@@ -1,4 +1,12 @@
-import { Controller, Get, Patch, Param, Body, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Param,
+  Body,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import ComprasClient from '../infrastructure/compras.client';
 import { ActualizarCompraDto } from './dto/actualizar-compra.dto';
@@ -27,7 +35,10 @@ export class ComprasController {
   }
 
   @Patch(':id')
-  async updateOrder(@Param('id') id: string, @Body() body: ActualizarCompraDto) {
+  async updateOrder(
+    @Param('id') id: string,
+    @Body() body: ActualizarCompraDto,
+  ) {
     return await comprasClient.updateOrder(id, body);
   }
 }

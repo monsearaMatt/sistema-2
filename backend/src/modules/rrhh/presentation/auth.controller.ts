@@ -1,26 +1,27 @@
-import { Body, Controller, Post, UsePipes, ValidationPipe, UnauthorizedException } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  ValidationPipe,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from '../application/auth.service';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, MinLength, Matches } from 'class-validator';
 
 class LoginDto {
   @IsNotEmpty()
+  @Matches(/^\d{7,8}-[\dkK]$/, {
+    message: 'Formato de RUT inválido (ej: 12345678-9)',
+  })
   rut!: string;
 
   @IsNotEmpty()
-  password!: string;
-}
-
-class RegisterDto {
-  @IsNotEmpty()
-  username!: string;
-
-  @IsNotEmpty()
+  @MinLength(4, { message: 'La contraseña debe tener al menos 4 caracteres' })
   password!: string;
 }
 
 @Controller('auth')
-@UsePipes(new ValidationPipe({ transform: true }))
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
@@ -44,19 +45,5 @@ export class AuthController {
       statusCode: 200,
       success: true,
     };
-  }
-
-  @Post('register')
-  async register(@Body() dto: RegisterDto) {
-    const existing = await this.prisma.rRHH_usuario.findFirst({
-      where: { username: dto.username },
-    });
-    if (existing) {
-      return { status: 'error', message: 'Username already exists' };
-    }
-    await this.prisma.rRHH_usuario.create({
-      data: { username: dto.username, password: dto.password },
-    });
-    return { message: 'User registered successfully' };
   }
 }

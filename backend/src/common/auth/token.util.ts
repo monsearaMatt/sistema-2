@@ -11,11 +11,19 @@ function base64UrlDecode(input: string) {
 }
 
 export function signToken(payload: JwtPayload, secret: string) {
+  const now = Math.floor(Date.now() / 1000);
+  const enriched = {
+    ...payload,
+    iat: now,
+    exp: now + 86400, // 24 hours
+  };
   const header = { alg: 'HS256', typ: 'JWT' };
   const encodedHeader = base64UrlEncode(JSON.stringify(header));
-  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+  const encodedPayload = base64UrlEncode(JSON.stringify(enriched));
   const data = `${encodedHeader}.${encodedPayload}`;
-  const signature = createHmac('sha256', secret).update(data).digest('base64url');
+  const signature = createHmac('sha256', secret)
+    .update(data)
+    .digest('base64url');
   return `${data}.${signature}`;
 }
 
@@ -26,9 +34,16 @@ export function verifyToken(token: string, secret: string): JwtPayload {
   }
   const [encodedHeader, encodedPayload, signature] = parts;
   const data = `${encodedHeader}.${encodedPayload}`;
-  const expected = createHmac('sha256', secret).update(data).digest('base64url');
+  const expected = createHmac('sha256', secret)
+    .update(data)
+    .digest('base64url');
   if (expected !== signature) {
     throw new Error('Invalid token signature');
   }
-  return JSON.parse(base64UrlDecode(encodedPayload)) as JwtPayload;
+  const payload = JSON.parse(base64UrlDecode(encodedPayload)) as JwtPayload;
+  const now = Math.floor(Date.now() / 1000);
+  if (payload.exp && typeof payload.exp === 'number' && payload.exp < now) {
+    throw new Error('Token expired');
+  }
+  return payload;
 }

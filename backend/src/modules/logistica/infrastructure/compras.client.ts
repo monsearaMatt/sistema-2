@@ -1,6 +1,7 @@
 export class ComprasClient {
   constructor(baseUrl?: string) {
-    this.baseUrl = baseUrl || process.env.COMPRAS_API_URL || 'http://localhost:4000';
+    this.baseUrl =
+      baseUrl || process.env.COMPRAS_API_URL || 'http://localhost:4000';
   }
 
   private readonly baseUrl: string;

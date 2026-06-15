@@ -1,6 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-import { CrearSolicitudDto, ActualizarSolicitudDto } from '../presentation/dto/crear-solicitud.dto';
+import {
+  CrearSolicitudDto,
+  ActualizarSolicitudDto,
+} from '../presentation/dto/crear-solicitud.dto';
 
 @Injectable()
 export class SolicitudService {
@@ -35,7 +38,9 @@ export class SolicitudService {
       include: { RRHH_empleado: true },
     });
     if (!solicitud) {
-      throw new NotFoundException(`Solicitud con id ${id_solicitud} no encontrada`);
+      throw new NotFoundException(
+        `Solicitud con id ${id_solicitud} no encontrada`,
+      );
     }
     return this.toFrontend(solicitud);
   }
@@ -45,7 +50,9 @@ export class SolicitudService {
       where: { id_solicitud },
     });
     if (!solicitud) {
-      throw new NotFoundException(`Solicitud con id ${id_solicitud} no encontrada`);
+      throw new NotFoundException(
+        `Solicitud con id ${id_solicitud} no encontrada`,
+      );
     }
     const data: {
       estado: string;
@@ -53,8 +60,10 @@ export class SolicitudService {
       fecha_inicio?: Date;
       fecha_fin?: Date;
     } = { estado: dto.estado };
-    if (dto.tipo_solicitud !== undefined) data.tipo_solicitud = dto.tipo_solicitud;
-    if (dto.fecha_inicio !== undefined) data.fecha_inicio = new Date(dto.fecha_inicio);
+    if (dto.tipo_solicitud !== undefined)
+      data.tipo_solicitud = dto.tipo_solicitud;
+    if (dto.fecha_inicio !== undefined)
+      data.fecha_inicio = new Date(dto.fecha_inicio);
     if (dto.fecha_fin !== undefined) data.fecha_fin = new Date(dto.fecha_fin);
     const updated = await this.prisma.rRHH_solicitud.update({
       where: { id_solicitud },
@@ -67,7 +76,8 @@ export class SolicitudService {
   private toFrontend(s: any) {
     const inicio = s.fecha_inicio ? new Date(s.fecha_inicio) : new Date();
     const fin = s.fecha_fin ? new Date(s.fecha_fin) : new Date();
-    const dias = Math.ceil((fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24)) + 1;
+    const dias =
+      Math.ceil((fin.getTime() - inicio.getTime()) / (1000 * 60 * 60 * 24)) + 1;
     return {
       id_solicitud: String(s.id_solicitud),
       id_empleado: String(s.id_empleado),

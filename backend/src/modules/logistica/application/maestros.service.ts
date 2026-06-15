@@ -35,7 +35,9 @@ export class MaestrosService {
   }
 
   async listClientes() {
-    return this.prisma.maestro_cliente.findMany({ orderBy: { id_cliente: 'asc' } });
+    return this.prisma.maestro_cliente.findMany({
+      orderBy: { id_cliente: 'asc' },
+    });
   }
 
   async listProductos() {
@@ -47,7 +49,9 @@ export class MaestrosService {
   }
 
   async listProveedores() {
-    return this.prisma.maestro_proveedor.findMany({ orderBy: { nombre: 'asc' } });
+    return this.prisma.maestro_proveedor.findMany({
+      orderBy: { nombre: 'asc' },
+    });
   }
 
   async listMovimientos() {

@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { CrearRecepcionDto } from '../presentation/dto/crear-recepcion.dto';
 
@@ -12,7 +16,9 @@ export class RecepcionService {
       where: { id: dto.id_orden_compra },
     });
     if (!oc) {
-      throw new NotFoundException(`Orden de Compra #${dto.id_orden_compra} no encontrada`);
+      throw new NotFoundException(
+        `Orden de Compra #${dto.id_orden_compra} no encontrada`,
+      );
     }
 
     // 2. Validate that the employee exists in RRHH
@@ -20,7 +26,9 @@ export class RecepcionService {
       where: { id_empleado: dto.id_empleado },
     });
     if (!empleado) {
-      throw new NotFoundException(`Empleado con ID ${dto.id_empleado} no encontrado en RRHH`);
+      throw new NotFoundException(
+        `Empleado con ID ${dto.id_empleado} no encontrado en RRHH`,
+      );
     }
 
     // 3. Check if reception already exists for this OC
@@ -28,7 +36,9 @@ export class RecepcionService {
       where: { id_orden_compra: dto.id_orden_compra },
     });
     if (existing) {
-      throw new BadRequestException(`La Orden de Compra #${dto.id_orden_compra} ya tiene un registro de recepción`);
+      throw new BadRequestException(
+        `La Orden de Compra #${dto.id_orden_compra} ya tiene un registro de recepción`,
+      );
     }
 
     // 4. Create reception
@@ -50,11 +60,15 @@ export class RecepcionService {
       where: { id_recepcion },
     });
     if (!reception) {
-      throw new NotFoundException(`Registro de recepción #${id_recepcion} no encontrado`);
+      throw new NotFoundException(
+        `Registro de recepción #${id_recepcion} no encontrado`,
+      );
     }
 
     if (!reception.id_orden_compra) {
-      throw new BadRequestException(`El registro de recepción #${id_recepcion} no tiene una orden de compra asociada`);
+      throw new BadRequestException(
+        `El registro de recepción #${id_recepcion} no tiene una orden de compra asociada`,
+      );
     }
 
     // 2. Fetch purchase order
@@ -64,11 +78,15 @@ export class RecepcionService {
     });
 
     if (!oc) {
-      throw new NotFoundException(`Orden de Compra #${reception.id_orden_compra} no encontrada`);
+      throw new NotFoundException(
+        `Orden de Compra #${reception.id_orden_compra} no encontrada`,
+      );
     }
 
     if (oc.ingresada) {
-      throw new BadRequestException(`La Orden de Compra #${oc.id} ya fue ingresada a inventario`);
+      throw new BadRequestException(
+        `La Orden de Compra #${oc.id} ya fue ingresada a inventario`,
+      );
     }
 
     // 3. Process stock updates in transaction
@@ -77,7 +95,10 @@ export class RecepcionService {
         let product: any = null;
 
         // A. If id_producto is UUID, look it up directly
-        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(item.id_producto);
+        const isUuid =
+          /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+            item.id_producto,
+          );
         if (isUuid) {
           product = await tx.producto.findUnique({
             where: { id_producto: item.id_producto },
@@ -94,22 +115,31 @@ export class RecepcionService {
         // C. Look up by name case-insensitively
         if (!product) {
           product = await tx.producto.findFirst({
-            where: { nombre: { equals: item.nombre_producto, mode: 'insensitive' } },
+            where: {
+              nombre: { equals: item.nombre_producto, mode: 'insensitive' },
+            },
           });
         }
 
         // D. Create if still not found
         if (!product) {
           const baseCode = isUuid
-            ? `PRO-${item.nombre_producto.replace(/[^a-zA-Z0-9]/g, '').substring(0, 8).toUpperCase()}`
+            ? `PRO-${item.nombre_producto
+                .replace(/[^a-zA-Z0-9]/g, '')
+                .substring(0, 8)
+                .toUpperCase()}`
             : item.id_producto.substring(0, 12).toUpperCase();
 
           let finalCode = baseCode;
-          let exists = await tx.producto.findUnique({ where: { codigo: finalCode } });
+          let exists = await tx.producto.findUnique({
+            where: { codigo: finalCode },
+          });
           let counter = 1;
           while (exists && counter < 100) {
             finalCode = `${baseCode.substring(0, 9)}-${counter}`;
-            exists = await tx.producto.findUnique({ where: { codigo: finalCode } });
+            exists = await tx.producto.findUnique({
+              where: { codigo: finalCode },
+            });
             counter++;
           }
 
@@ -139,7 +169,9 @@ export class RecepcionService {
             tipo: 'ENTRADA',
             cantidad: item.cantidad,
             referencia: `Recepción Compra OC #${oc.id.substring(0, 8)}`,
-            empleado_id: reception.id_empleado ? `emp-${reception.id_empleado}` : 'system-logistica',
+            empleado_id: reception.id_empleado
+              ? `emp-${reception.id_empleado}`
+              : 'system-logistica',
             producto_id: product.id_producto,
           },
         });
@@ -157,7 +189,8 @@ export class RecepcionService {
       return {
         success: true,
         reception,
-        message: 'Ingreso a inventario confirmado y stock actualizado exitosamente',
+        message:
+          'Ingreso a inventario confirmado y stock actualizado exitosamente',
       };
     });
   }

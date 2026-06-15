@@ -6,12 +6,12 @@ import {
   Patch,
   Delete,
   Param,
-  UsePipes,
-  ValidationPipe,
-  ParseIntPipe,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../../../common/auth/jwt-auth.guard';
+import { RolesGuard } from '../../../common/auth/roles.guard';
+import { Roles } from '../../../common/auth/roles.decorator';
 import {
   CrearEmpleadoDto,
   ActualizarEmpleadoDto,
@@ -19,12 +19,12 @@ import {
 import { EmpleadoService } from '../application/empleado.service';
 
 @Controller('rrhh/empleados')
-@UsePipes(new ValidationPipe({ transform: true }))
 export class EmpleadoController {
   constructor(private readonly empleadoService: EmpleadoService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin RRHH', 'Admin Sistema')
   async create(@Body() dto: CrearEmpleadoDto) {
     return this.empleadoService.create(dto);
   }
@@ -40,7 +40,8 @@ export class EmpleadoController {
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin RRHH', 'Admin Sistema')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ActualizarEmpleadoDto,
@@ -49,13 +50,15 @@ export class EmpleadoController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin RRHH', 'Admin Sistema')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.empleadoService.remove(id);
   }
 
   @Patch(':id/desactivar')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin RRHH', 'Admin Sistema')
   async desactivar(@Param('id', ParseIntPipe) id: number) {
     await this.empleadoService.remove(id);
     return { message: 'Empleado desactivado.' };

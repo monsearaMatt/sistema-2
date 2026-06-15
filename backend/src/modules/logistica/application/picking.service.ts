@@ -1,6 +1,10 @@
 // File: src/modules/logistica/application/picking.service.ts
 // Servicio para log_picking: create, assign, findAll, confirmDispatch
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
 import { CrearPickingDto } from '../presentation/dto/crear-picking.dto';
 
@@ -15,7 +19,7 @@ export class PickingService {
       5010: 'NOT-011', // ASUS TUF 15
       5015: 'NOT-012', // Notebook Lenovo
       5020: 'NOT-090', // Notebook Thinkpad X15
-      1: 'NOT-NOTE',    // NOTEBOOK AB
+      1: 'NOT-NOTE', // NOTEBOOK AB
     };
     return map[id] || 'PRO-PROD'; // Fallback to Producto 1
   }
@@ -60,7 +64,9 @@ export class PickingService {
     }
 
     if (!picking.id_pedido_venta) {
-      throw new BadRequestException(`El picking OT #${id_ot} no está asociado a ningún pedido de ventas`);
+      throw new BadRequestException(
+        `El picking OT #${id_ot} no está asociado a ningún pedido de ventas`,
+      );
     }
 
     const salesOrder = await this.prisma.ventas_pedido.findUnique({
@@ -69,29 +75,35 @@ export class PickingService {
     });
 
     if (!salesOrder) {
-      throw new NotFoundException(`Pedido de ventas #${picking.id_pedido_venta} no encontrado`);
+      throw new NotFoundException(
+        `Pedido de ventas #${picking.id_pedido_venta} no encontrado`,
+      );
     }
 
     if (salesOrder.estado === 'enviado' || salesOrder.estado === 'completado') {
-      throw new BadRequestException(`El pedido de ventas #${salesOrder.id_pedido} ya ha sido procesado (estado: ${salesOrder.estado})`);
+      throw new BadRequestException(
+        `El pedido de ventas #${salesOrder.id_pedido} ya ha sido procesado (estado: ${salesOrder.estado})`,
+      );
     }
 
     // Process all stock deductions inside a transaction
     return this.prisma.$transaction(async (tx) => {
       for (const item of salesOrder.ventas_detalle) {
         const productCode = this.mapVentasIdToInventarioCode(item.id_producto);
-        
+
         let product = await tx.producto.findUnique({
           where: { codigo: productCode },
         });
 
         if (!product) {
-          throw new NotFoundException(`Producto de inventario con código "${productCode}" no encontrado`);
+          throw new NotFoundException(
+            `Producto de inventario con código "${productCode}" no encontrado`,
+          );
         }
 
         if (product.stock_actual < item.cantidad) {
           throw new BadRequestException(
-            `Stock insuficiente en inventario para "${product.nombre}". Disponible: ${product.stock_actual}, Solicitado: ${item.cantidad}`
+            `Stock insuficiente en inventario para "${product.nombre}". Disponible: ${product.stock_actual}, Solicitado: ${item.cantidad}`,
           );
         }
 
@@ -109,7 +121,9 @@ export class PickingService {
             tipo: 'SALIDA',
             cantidad: item.cantidad,
             referencia: `Despacho Picking OT #${id_ot}`,
-            empleado_id: picking.id_empleado ? `emp-${picking.id_empleado}` : 'system-logistica',
+            empleado_id: picking.id_empleado
+              ? `emp-${picking.id_empleado}`
+              : 'system-logistica',
             producto_id: product.id_producto,
           },
         });
@@ -129,7 +143,8 @@ export class PickingService {
       return {
         success: true,
         picking: updatedPicking,
-        message: 'Egreso de inventario confirmado y despacho realizado con éxito',
+        message:
+          'Egreso de inventario confirmado y despacho realizado con éxito',
       };
     });
   }

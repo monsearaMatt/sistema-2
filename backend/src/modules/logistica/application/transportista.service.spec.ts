@@ -29,7 +29,11 @@ describe('TransportistaService', () => {
   });
 
   it('create should call prisma.create and return result', async () => {
-    const dto = { nombre_transp: 'Prueba', patente_vehiculo: 'ABC123', id_empleado: 1 } as CrearTransportistaDto;
+    const dto = {
+      nombre_transp: 'Prueba',
+      patente_vehiculo: 'ABC123',
+      id_empleado: 1,
+    };
     const expected = { id_transportista: 1, ...dto };
     mockPrisma.log_transportista.create.mockResolvedValue(expected);
 
@@ -51,7 +55,9 @@ describe('TransportistaService', () => {
 
     const res = await service.findAll();
 
-    expect(mockPrisma.log_transportista.findMany).toHaveBeenCalledWith({ include: { RRHH_empleado: true } });
+    expect(mockPrisma.log_transportista.findMany).toHaveBeenCalledWith({
+      include: { RRHH_empleado: true },
+    });
     expect(res).toEqual(expected);
   });
 });

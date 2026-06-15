@@ -15,7 +15,9 @@ describe('Guia (e2e)', () => {
   } as any;
 
   beforeEach(async () => {
-    const moduleFixture: TestingModule = await Test.createTestingModule({ imports: [AppModule] })
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    })
       .overrideProvider(PrismaService)
       .useValue(mockPrisma)
       .compile();
@@ -47,7 +49,9 @@ describe('Guia (e2e)', () => {
     const list = [{ id_guia: 1 }];
     mockPrisma.log_guia_despacho.findMany.mockResolvedValue(list);
 
-    const res = await request(app.getHttpServer()).get('/logistica/guias').expect(200);
+    const res = await request(app.getHttpServer())
+      .get('/logistica/guias')
+      .expect(200);
 
     expect(res.body).toEqual(list);
     expect(mockPrisma.log_guia_despacho.findMany).toHaveBeenCalled();

@@ -33,6 +33,11 @@ export class AuthService {
       role: empleado?.RRHH_rol?.name_rol ?? null,
       username: userRecord.username,
     };
-    return { access_token: signToken(payload, process.env.JWT_SECRET || 'changeme') };
+    return {
+      access_token: signToken(
+        payload,
+        process.env.JWT_SECRET || 'sistema-2-secret-key',
+      ),
+    };
   }
 }

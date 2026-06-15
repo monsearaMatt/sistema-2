@@ -38,12 +38,17 @@ export class TransportistaController {
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: ActualizarTransportistaDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ActualizarTransportistaDto,
+  ) {
     try {
       return await this.transportistaService.update(id, dto);
     } catch (err) {
       const message =
-        err instanceof Error ? err.message : 'Error al actualizar transportista';
+        err instanceof Error
+          ? err.message
+          : 'Error al actualizar transportista';
       throw new HttpException(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
