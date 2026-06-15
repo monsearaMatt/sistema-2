@@ -42,8 +42,12 @@ export class EmpleadoService {
     } catch (err: any) {
       if (err?.code === 'P2002') {
         const target = (err.meta?.target as string[]) ?? [];
-        if (target.includes('rut')) {
+        const targetStr = target.join(',');
+        if (targetStr.includes('rut')) {
           throw new BadRequestException('El RUT ingresado ya está registrado.');
+        }
+        if (targetStr.includes('username')) {
+          throw new BadRequestException('El nombre de usuario ya está en uso.');
         }
         throw new BadRequestException('Ya existe un registro con ese valor.');
       }
