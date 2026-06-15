@@ -94,7 +94,11 @@ function StatCard({ icon: Icon, label, value, sub, color = "text-primary" }: {
 
 function ModalAltaEmpleado({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { data: roles = [] } = useRoles();
-  const crear = useCrearEmpleado(() => onClose());
+  const [serverError, setServerError] = useState("");
+  const crear = useCrearEmpleado(
+    () => { setServerError(""); onClose(); },
+    (msg) => setServerError(msg),
+  );
 
   const [form, setForm] = useState({ rut: "", nombre: "", correo: "", telefono: "", id_rol: 0 });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -167,7 +171,7 @@ function ModalAltaEmpleado({ open, onClose }: { open: boolean; onClose: () => vo
 
         {crear.isError && (
           <div className="rounded-md border border-red-500/20 bg-red-500/10 px-3 py-2">
-            <p className="text-sm text-red-500">Error al crear el empleado. Intenta nuevamente.</p>
+            <p className="text-sm text-red-500">{serverError || "Error al crear el empleado. Intenta nuevamente."}</p>
           </div>
         )}
 
