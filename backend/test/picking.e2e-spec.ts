@@ -34,7 +34,12 @@ describe('Picking (e2e)', () => {
 
   it('POST /logistica/pickings -> 201', async () => {
     const dto = { id_pedido_venta: 5001 };
-    const created = { id_ot: 777, ...dto, fecha_creacion: new Date().toISOString(), estado: 'Pendiente' };
+    const created = {
+      id_ot: 777,
+      ...dto,
+      fecha_creacion: new Date().toISOString(),
+      estado: 'Pendiente',
+    };
     mockPrisma.log_picking.create.mockResolvedValue(created);
 
     const res = await request(app.getHttpServer())

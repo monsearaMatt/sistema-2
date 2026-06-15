@@ -5,10 +5,12 @@ import {
   Patch,
   Body,
   Param,
-  UsePipes,
-  ValidationPipe,
+  UseGuards,
   ParseIntPipe,
 } from '@nestjs/common';
+import { JwtAuthGuard } from '../../../common/auth/jwt-auth.guard';
+import { RolesGuard } from '../../../common/auth/roles.guard';
+import { Roles } from '../../../common/auth/roles.decorator';
 import {
   CrearSolicitudDto,
   ActualizarSolicitudDto,
@@ -16,11 +18,11 @@ import {
 import { SolicitudService } from '../application/solicitud.service';
 
 @Controller('rrhh/solicitudes')
-@UsePipes(new ValidationPipe({ transform: true }))
 export class SolicitudController {
   constructor(private readonly solicitudService: SolicitudService) {}
 
   @Post()
+  @UseGuards(JwtAuthGuard)
   async create(@Body() dto: CrearSolicitudDto) {
     return this.solicitudService.create(dto);
   }
@@ -36,6 +38,8 @@ export class SolicitudController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin RRHH', 'Admin Sistema')
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: ActualizarSolicitudDto,

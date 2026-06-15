@@ -1,4 +1,12 @@
-import { IsString, IsIn, IsArray, ValidateNested, IsOptional, IsUUID, IsNumber } from 'class-validator';
+import {
+  IsString,
+  IsIn,
+  IsArray,
+  ValidateNested,
+  IsOptional,
+  IsUUID,
+  IsNumber,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 
 class DetalleRecibidoDto {

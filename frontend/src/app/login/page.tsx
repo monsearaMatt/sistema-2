@@ -37,7 +37,7 @@ export default function LoginPage() {
     const submit = (e: SyntheticEvent) => {
         e.preventDefault();
         setErrorMsg("");
-        login.mutate({ username, password });
+        login.mutate({ rut: username, password });
     };
 
     return (

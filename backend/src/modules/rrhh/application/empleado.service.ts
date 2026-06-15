@@ -1,24 +1,54 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { PrismaService } from '../../../common/prisma/prisma.service';
-import { CrearEmpleadoDto, ActualizarEmpleadoDto } from '../presentation/dto/crear-empleado.dto';
+import {
+  CrearEmpleadoDto,
+  ActualizarEmpleadoDto,
+} from '../presentation/dto/crear-empleado.dto';
 
 @Injectable()
 export class EmpleadoService {
   constructor(private readonly prisma: PrismaService) {}
 
   async create(dto: CrearEmpleadoDto) {
-    const empleado = await this.prisma.rRHH_empleado.create({
-      data: {
-        rut: dto.rut,
-        nombre: dto.nombre,
-        RRHH_rol: { connect: { id_rol: dto.id_rol } },
-        correo: dto.correo ?? null,
-        telefono: dto.telefono ?? null,
-        estado: dto.estado ?? 'Activo',
-      },
-      include: { RRHH_rol: true },
-    });
-    return this.toFrontend(empleado);
+    try {
+      const empleado = await this.prisma.rRHH_empleado.create({
+        data: {
+          rut: dto.rut,
+          nombre: dto.nombre,
+          RRHH_rol: { connect: { id_rol: dto.id_rol } },
+          correo: dto.correo ?? null,
+          telefono: dto.telefono ?? null,
+          estado: dto.estado ?? 'Activo',
+        },
+        include: { RRHH_rol: true },
+      });
+      const existingUser = await this.prisma.rRHH_usuario.findFirst({
+        where: { id_empleado: empleado.id_empleado },
+      });
+      if (!existingUser) {
+        await this.prisma.rRHH_usuario.create({
+          data: {
+            username: dto.rut,
+            password: dto.rut,
+            id_empleado: empleado.id_empleado,
+          },
+        });
+      }
+      return this.toFrontend(empleado);
+    } catch (err: any) {
+      if (err?.code === 'P2002') {
+        const target = (err.meta?.target as string[]) ?? [];
+        if (target.includes('rut')) {
+          throw new BadRequestException('El RUT ingresado ya está registrado.');
+        }
+        throw new BadRequestException('Ya existe un registro con ese valor.');
+      }
+      throw err;
+    }
   }
 
   async findAll() {
@@ -34,7 +64,9 @@ export class EmpleadoService {
       include: { RRHH_rol: true },
     });
     if (!empleado) {
-      throw new NotFoundException(`Empleado con id ${id_empleado} no encontrado`);
+      throw new NotFoundException(
+        `Empleado con id ${id_empleado} no encontrado`,
+      );
     }
     return this.toFrontend(empleado);
   }

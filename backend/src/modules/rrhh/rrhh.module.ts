@@ -17,12 +17,7 @@ import { AuthService } from './application/auth.service';
     SolicitudController,
     AuthController,
   ],
-  providers: [
-    EmpleadoService,
-    RolService,
-    SolicitudService,
-    AuthService,
-  ],
+  providers: [EmpleadoService, RolService, SolicitudService, AuthService],
   exports: [AuthService],
 })
 export class RrhhModule {}

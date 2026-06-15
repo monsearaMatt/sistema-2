@@ -66,7 +66,7 @@ model log_transportista {
 
 model RRHH_empleado {
   id_empleado       Int                 @id @default(autoincrement())
-  rut               String?             @db.VarChar(12)
+  rut               String?             @unique @db.VarChar(12)
   nombre            String?             @db.VarChar(100)
   id_rol            Int?
   correo            String?             @db.VarChar(100)
@@ -84,7 +84,7 @@ model RRHH_empleado {
 
 model RRHH_rol {
   id_rol        Int             @id @default(autoincrement())
-  name_rol      String?         @db.VarChar(100)
+  name_rol      String?             @unique @db.VarChar(100)
   RRHH_empleado RRHH_empleado[]
 
   @@schema("RRHH")
@@ -104,7 +104,7 @@ model RRHH_solicitud {
 
 model RRHH_usuario {
   id_usuario    Int            @id @default(autoincrement())
-  username      String?        @db.VarChar(50)
+  username      String?             @unique @db.VarChar(50)
   password      String?        @db.VarChar(255)
   id_empleado   Int?
   RRHH_empleado RRHH_empleado? @relation(fields: [id_empleado], references: [id_empleado], onDelete: NoAction, onUpdate: NoAction, map: "fk_usuario_empleado")

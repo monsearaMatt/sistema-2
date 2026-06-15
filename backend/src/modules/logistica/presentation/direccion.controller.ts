@@ -38,7 +38,10 @@ export class DireccionController {
   }
 
   @Patch(':id')
-  async update(@Param('id', ParseIntPipe) id: number, @Body() dto: ActualizarDireccionDto) {
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ActualizarDireccionDto,
+  ) {
     try {
       return await this.direccionService.update(id, dto);
     } catch (err) {

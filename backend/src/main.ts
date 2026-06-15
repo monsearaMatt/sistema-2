@@ -14,7 +14,11 @@ async function bootstrap() {
   });
   // ValidationPipe global: transforma y elimina propiedades inesperadas
   app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
   );
   await app.listen(process.env.PORT ?? 3000);
 }
