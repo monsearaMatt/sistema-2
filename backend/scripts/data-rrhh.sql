@@ -7,7 +7,8 @@ INSERT INTO "RRHH"."RRHH_rol" (id_rol, name_rol) VALUES
 (2, 'Admin RRHH'),
 (3, 'Jefe de Logística'),
 (4, 'Operador de Bodega'),
-(5, 'Empleado');
+(5, 'Jefe Compras'),
+(6, 'Jefe de Bodega');
 
 -- ========== EMPLEADOS (RRHH schema) ==========
 INSERT INTO "RRHH"."RRHH_empleado" (id_empleado, rut, nombre, id_rol, correo, telefono, estado) VALUES
@@ -16,13 +17,14 @@ INSERT INTO "RRHH"."RRHH_empleado" (id_empleado, rut, nombre, id_rol, correo, te
 (3, '11223344-5', 'Jorge Vargas Muñoz', 5, 'j.vargas@empresa.cl', '+56965432109', 'Activo'),
 (4, '55667788-K', 'Ana Martínez López', 5, 'a.martinez@empresa.cl', '+56954321098', 'Activo'),
 (5, '33445566-7', 'Rodrigo Silva Castro', 2, 'r.silva@empresa.cl', '+56943210987', 'Activo'),
-(6, '77889900-2', 'Valentina Rojas Herrera', 5, 'v.rojas@empresa.cl', '+56932109876', 'Activo'),
+(6, '77889900-2', 'Valentina Rojas Herrera', 4, 'v.rojas@empresa.cl', '+56932109876', 'Activo'),
 (7, '22334455-6', 'Felipe Torres Díaz', 1, 'f.torres@empresa.cl', '+56921098765', 'Activo'),
-(8, '44556677-3', 'Catalina Fuentes Reyes', 5, 'c.fuentes@empresa.cl', '+56910987654', 'Inactivo'),
+(8, '44556677-3', 'Catalina Fuentes Reyes', 4, 'c.fuentes@empresa.cl', '+56910987654', 'Inactivo'),
 (9, '11334455-8', 'Pedro González Rodríguez', 4, 'p.gonzalez@empresa.cl', '+56988776655', 'Activo'),
 (10, '22887766-0', 'Juan Martínez López', 4, 'j.martinez@empresa.cl', '+56977665544', 'Activo'),
 (11, '33552211-4', 'Miguel Rojas Sáez', 4, 'm.rojas@empresa.cl', '+56966554433', 'Activo'),
-(12, '44112233-9', 'Andrés Yáñez Vega', 4, 'a.yanez@empresa.cl', '+56955443322', 'Activo');
+(12, '44112233-9', 'Andrés Yáñez Vega', 4, 'a.yanez@empresa.cl', '+56955443322', 'Activo'),
+(13, '55443322-1', 'Roberto Muñoz Lillo', 6, 'r.munoz@empresa.cl', '+56944332211', 'Activo');
 
 -- ========== SOLICITUDES (RRHH schema) ==========
 INSERT INTO "RRHH"."RRHH_solicitud" (id_solicitud, id_empleado, tipo_solicitud, fecha_inicio, fecha_fin, estado) VALUES
@@ -49,7 +51,8 @@ INSERT INTO "RRHH"."RRHH_usuario" (id_usuario, username, password, id_empleado) 
 (9, '11334455-8', '11334455-8', 9),
 (10, '22887766-0', '22887766-0', 10),
 (11, '33552211-4', '33552211-4', 11),
-(12, '44112233-9', '44112233-9', 12);
+(12, '44112233-9', '44112233-9', 12),
+(13, '55443322-1', '55443322-1', 13);
 
 -- ========== VERIFICACIONES ==========
 SELECT 'RRHH_rol' as tabla, COUNT(*) as count FROM "RRHH"."RRHH_rol"
